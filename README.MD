@@ -7,7 +7,7 @@ The **Server** is a small (about 5MB currently) console application that runs in
 Mac, and Linux. Install it on the computer driving the DSPi Pico USB port. It takes very few resources.
 
 Web View
-![web](./DSPiCliRemote/Images/Gui001.png)
+![web](./Images/Gui001.png)
 
 The Server listens to two network ports (your choice which) and 
 * on one port it has a simple 
