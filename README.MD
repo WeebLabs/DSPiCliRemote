@@ -1,10 +1,23 @@
 ## DSPi CommandLine Client and Server
 MZachmann
 
-This is a third party application intended to work with the [WeebLabs DSPi project](https://github.com/WeebLabs/DSPi).
+This is a tiny web page provider intended to work with the [WeebLabs DSPi project](https://github.com/WeebLabs/DSPi) that provides a quick gui via web browser.
+
+### To run it:
+* download the latest release from the [releases page](https://github.com/WeebLabs/DSPiCommandLineClient/releases)
+* install .NET 10 if you haven't already
+* unzip the archive into a folder
+* run the server and it should start listening then sit there
+* run a browser and go to http://yourip:yourport
+
+### To build it:
+* open the solution in Visual Studio or JetBrains Rider
+* copy the two DSPi project (DSPiConsole.Usb and DSPiConsole.Core) into the solution folder
+
+### What is it?
 
 The **Server** is a small (about 5MB currently) console application that runs in Windows, 
-Mac, and Linux. Install it on the computer driving the DSPi Pico USB port. It takes very few resources.
+Mac, and Linux. Install/run it on the computer driving the DSPi Pico USB port. It takes very few resources.
 
 Web View
 ![web](./Images/Gui001.png)
