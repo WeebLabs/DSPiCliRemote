@@ -1,0 +1,26 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DSPiCliClient.MainWindow"
+        Title="Test Client" Width="400" Height="500">
+    <DockPanel Margin="10">
+        <StackPanel DockPanel.Dock="Top" Spacing="5" Margin="0,0,0,10">
+            <Grid ColumnDefinitions="Auto,*,Auto,80">
+                <TextBlock Text="Addr:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <TextBox Name="AddressBox" Grid.Column="1" Text="localhost" Margin="0,0,10,0"/>
+                <TextBlock Text="Port:" Grid.Column="2" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <TextBox Name="PortBox" Grid.Column="3" Text="8082"/>
+            </Grid>
+            <Button Name="ConnectButton" Content="Connect" HorizontalAlignment="Stretch" Click="OnConnectClick"/>
+        </StackPanel>
+        <StackPanel DockPanel.Dock="Bottom" Spacing="5" Margin="0,10,0,0">
+            <StackPanel Orientation="Horizontal" Spacing="5">
+                <TextBox Name="InputBox" Watermark="Enter command..." Width="300" />
+                <Button Name="SendButton" Content="OK" IsDefault="True" Click="OnSendClick" />
+            </StackPanel>
+            <Button Content="Open Device Control" HorizontalAlignment="Stretch" Click="OnOpenDeviceControlClick" />
+        </StackPanel>
+        <ScrollViewer>
+            <SelectableTextBlock Name="DisplayBlock" TextWrapping="Wrap" />
+        </ScrollViewer>
+    </DockPanel>
+</Window>
