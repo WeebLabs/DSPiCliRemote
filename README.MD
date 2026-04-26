@@ -4,7 +4,7 @@ MZachmann
 This is a tiny web page provider intended to work with the [WeebLabs DSPi project](https://github.com/WeebLabs/DSPi) that provides a quick gui via web browser.
 
 ### To run it:
-* download the latest release from the [releases page](https://github.com/WeebLabs/DSPiCommandLineClient/releases)
+* download the latest release from the [releases page](https://github.com/MZachmann/DSPiCliRemote/releases)
 * install .NET 10 if you haven't already
 * unzip the archive into a folder
 * run the server and it should start listening then sit there
