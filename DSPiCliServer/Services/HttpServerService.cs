@@ -16,6 +16,7 @@ public class HttpServerService
     private TcpListener? _listener;
     private CancellationTokenSource? _cts;
     private readonly TcpServerService _tcpService;
+    private string _localIp = "Unknown";
 
     public event Action<string>? OnLog;
 
@@ -41,6 +42,20 @@ public class HttpServerService
             OnLog?.Invoke($"HTTP Server failed to start: {ex.Message}");
             Console.WriteLine($"HTTP Server failed to start: {ex.Message}");
         }
+        // just do this once per server instance
+        try
+        {
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    _localIp = ip.ToString();
+                    break;
+                }
+            }
+        }
+        catch { /* Ignore */ }    
     }
     
 
@@ -63,7 +78,14 @@ public class HttpServerService
         {
             try
             {
+                // whenever we get a new client connection
+                // we create a new task to handle it in the background
                 var client = await _listener!.AcceptTcpClientAsync(ct);
+                
+                // Set timeouts for HTTP requests
+                client.ReceiveTimeout = 5000;
+                client.SendTimeout = 5000;
+                
                 _ = Task.Run(() => HandleClientAsync(client, ct), ct);
             }
             catch (OperationCanceledException)
@@ -72,7 +94,12 @@ public class HttpServerService
             }
             catch (Exception ex)
             {
-                OnLog?.Invoke($"HTTP Error: {ex.Message}");
+                if (!ct.IsCancellationRequested)
+                {
+                    OnLog?.Invoke($"HTTP Error: {ex.Message}");
+                    // Wait a bit before retrying
+                    await Task.Delay(1000, ct);
+                }
             }
         }
     }
@@ -86,11 +113,17 @@ public class HttpServerService
             try
             {
                 // 1. Read Request Line
-                string? requestLine = await reader.ReadLineAsync(ct);
-                if (string.IsNullOrEmpty(requestLine)) return;
+                // Use a cancellation token with a timeout for initial request line
+                using var readCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+                readCts.CancelAfter(TimeSpan.FromSeconds(5));
+
+                string? requestLine = await reader.ReadLineAsync(readCts.Token);
+                if (string.IsNullOrEmpty(requestLine)) 
+                    return;
 
                 var parts = requestLine.Split(' ');
-                if (parts.Length < 3) return;
+                if (parts.Length < 3) 
+                    return;
 
                 string method = parts[0];
                 string path = parts[1];
@@ -99,7 +132,7 @@ public class HttpServerService
                 // 2. Read Headers
                 var headers = new System.Collections.Generic.Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 string? headerLine;
-                while (!string.IsNullOrEmpty(headerLine = await reader.ReadLineAsync(ct)))
+                while (!string.IsNullOrEmpty(headerLine = await reader.ReadLineAsync(readCts.Token)))
                 {
                     int colonIndex = headerLine.IndexOf(':');
                     if (colonIndex > 0)
@@ -130,7 +163,8 @@ public class HttpServerService
                 OnLog?.Invoke($"HandleClient Error: {ex.Message}");
                 try
                 {
-                    await SendResponseAsync(stream, 500, "Internal Server Error", "text/plain", "Internal Server Error");
+                    if(stream.CanWrite && ex is not OperationCanceledException)
+                        await SendResponseAsync(stream, 500, "Internal Server Error", "text/plain", "Internal Server Error");
                 }
                 catch { /* Ignore */ }
             }
@@ -142,12 +176,16 @@ public class HttpServerService
         string body = "";
         if (headers.TryGetValue("Content-Length", out string? lengthStr) && int.TryParse(lengthStr, out int length))
         {
+            using var readCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            readCts.CancelAfter(TimeSpan.FromSeconds(5));
+
             char[] buffer = new char[length];
             int read = 0;
             while (read < length)
             {
-                int n = await reader.ReadAsync(buffer, read, length - read);
-                if (n == 0) break;
+                int n = await reader.ReadAsync(buffer.AsMemory(read, length - read), readCts.Token);
+                if (n == 0) 
+                    break;
                 read += n;
             }
             body = new string(buffer, 0, read);
@@ -162,22 +200,7 @@ public class HttpServerService
 
     private async Task ServeIndexHtml(Stream stream)
     {
-        string localIp = "Unknown";
-        try
-        {
-            var host = Dns.GetHostEntry(Dns.GetHostName());
-            foreach (var ip in host.AddressList)
-            {
-                if (ip.AddressFamily == AddressFamily.InterNetwork)
-                {
-                    localIp = ip.ToString();
-                    break;
-                }
-            }
-        }
-        catch { /* Ignore */ }
-
-        string html = GetIndexHtml(localIp);
+        string html = GetIndexHtml(_localIp);
         await SendResponseAsync(stream, 200, "OK", "text/html", html);
     }
 

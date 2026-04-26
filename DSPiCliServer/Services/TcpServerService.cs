@@ -14,6 +14,9 @@ public class TcpServerService
 
     public event Action<string>? OnLog;
 
+    private readonly List<TcpClient> _clients = new();
+    private readonly object _clientsLock = new();
+
     public TcpServerService(int port = 8082)
     {
         _port = port;
@@ -35,27 +38,66 @@ public class TcpServerService
     {
         _cts?.Cancel();
         _listener?.Stop();
+        
+        lock (_clientsLock)
+        {
+            foreach (var client in _clients)
+            {
+                try { client.Dispose(); } catch { /* Ignore */ }
+            }
+            _clients.Clear();
+        }
+
         Console.WriteLine("Server stopped.");
         OnLog?.Invoke("Server stopped.");
     }
 
     private async Task AcceptClientsAsync(CancellationToken ct)
     {
-        try
+        while (!ct.IsCancellationRequested)
         {
-            while (!ct.IsCancellationRequested)
+            try
             {
                 var client = await _listener!.AcceptTcpClientAsync(ct);
-                _ = Task.Run(() => HandleClientAsync(client, ct), ct);
+                
+                // Set timeouts to prevent hanging on unreliable networks
+                client.ReceiveTimeout = 5000;
+                client.SendTimeout = 5000;
+                client.NoDelay = true; // Send data immediately
+
+                lock (_clientsLock)
+                {
+                    _clients.Add(client);
+                }
+
+                _ = Task.Run(async () => 
+                {
+                    try
+                    {
+                        await HandleClientAsync(client, ct);
+                    }
+                    finally
+                    {
+                        lock (_clientsLock)
+                        {
+                            _clients.Remove(client);
+                        }
+                    }
+                }, ct);
             }
-        }
-        catch (OperationCanceledException)
-        {
-            // Normal shutdown
-        }
-        catch (Exception ex)
-        {
-            OnLog?.Invoke($"Accept error: {ex.Message}");
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (Exception ex)
+            {
+                if (!ct.IsCancellationRequested)
+                {
+                    OnLog?.Invoke($"Accept error: {ex.Message}");
+                    // Wait a bit before retrying to avoid tight loop on persistent error
+                    await Task.Delay(1000, ct);
+                }
+            }
         }
     }
 
@@ -74,7 +116,8 @@ public class TcpServerService
                 while (!ct.IsCancellationRequested)
                 {
                     string? line = await reader.ReadLineAsync(ct);
-                    if (line == null) break;
+                    if (line == null) 
+                        break;
 
                     OnLog?.Invoke($"[{remoteEndPoint}] Received: {line}");
 
@@ -99,30 +142,29 @@ public class TcpServerService
 
     public async Task WriteClientAsync(string message)
     {
-        var client = await _listener!.AcceptTcpClientAsync();            
-        using (var stream = client.GetStream())
-        using (var writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true })
+        TcpClient[] clientsToNotify;
+        lock (_clientsLock)
         {
-            var remoteEndPoint = client.Client.RemoteEndPoint;
-            OnLog?.Invoke($"Client connected: {remoteEndPoint}");
+            clientsToNotify = _clients.ToArray();
+        }
 
+        var tasks = clientsToNotify.Select(async client =>
+        {
             try
             {
-                //while (!ct.IsCancellationRequested)
-                {
-                    await writer.WriteLineAsync(message);
-                    OnLog?.Invoke($"[{remoteEndPoint}] Sent: {message}");
-                }
+                var stream = client.GetStream();
+                var writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true };
+                await writer.WriteLineAsync(message);
+                OnLog?.Invoke($"[Broadcast] Sent to {client.Client.RemoteEndPoint}: {message}");
             }
             catch (Exception ex)
             {
-                OnLog?.Invoke($"[{remoteEndPoint}] Error: {ex.Message}");
+                OnLog?.Invoke($"[Broadcast] Error sending to {client.Client.RemoteEndPoint}: {ex.Message}");
+                // We don't remove the client here, HandleClientAsync's finally block will do it if the connection is dead
             }
-            finally
-            {
-                OnLog?.Invoke($"[{remoteEndPoint}] Client disconnected.");
-            }
-        }
+        });
+
+        await Task.WhenAll(tasks);
     }
 
     private string DoHello()
