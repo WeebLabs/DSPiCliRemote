@@ -23,11 +23,20 @@ Web View
 ![web](./Images/Gui001.png)
 
 The Server listens to two network ports (your choice which) and 
-* on one port it has a simple 
-**web server that provies a one page GUI** to adjust volume, loudness and presets
-* on the second port it allows **CLI clients** to attach for freeform text commanding.
+* the first port has a simple 
+**web server that provides a one page GUI** to adjust volume, loudness and presets
+* the second port allows **CLI clients** to attach for freeform text commanding.
 
 The _optional_ **Client** is a smallish .NET Core / Amazonia application that runs in Windows, 
 Mac, and Linux. It should run on any desktop (Windows, Mac, Linux). It has a small 
 user interface that lets you send text queries and commands to the DSPi Pico and get text results. 
 It also has a secondary Window with a display like the web page.
+
+### Notes
+#### Mac OS X
+For Mac you will need to install the libusb-1.0.dylib library and ensure it is visible in the path. Homebrew (brew) works
+well for this: "brew install libusb".
+#### Linux
+The linux build is currently being tested. It runs but also needs some unclear fixup for talking to the DSPi usb port. When (if?) this is
+tested and running the two linux releases (x64 and arm64) will be added to the release.
+
