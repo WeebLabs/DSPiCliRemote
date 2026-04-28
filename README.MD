@@ -1,7 +1,8 @@
 ## DSPi CommandLine Client and Server
 MZachmann
 
-This is a tiny web page provider intended to work with the [WeebLabs DSPi project](https://github.com/WeebLabs/DSPi) that provides a quick gui via web browser.
+This is a tiny web page provider intended to work with the [WeebLabs DSPi project](https://github.com/WeebLabs/DSPi) that provides a quick 
+gui via web browser.
 
 ### To prepare to run it:
 * install .NET 10 if you haven't already (see below)
@@ -21,7 +22,9 @@ then it starts listening and just sits there
 ### What is it?
 
 The **Server** is a small (about 5MB currently) console application that runs in Windows, 
-Mac, and Linux. Install/run it on the computer driving the DSPi Pico USB port. It takes very few resources.
+Mac, and Linux (Ubuntu and Raspbian are tested).
+
+Install/run it on the computer driving the DSPi Pico USB port. It takes very few resources.
 
 ![web](./Images/Gui001.png)
 
@@ -51,7 +54,7 @@ After you try to run the app, unblock it
 in the Privacy tab of the Security & Privacy settings and allow it to run/communicate.
 
 #### Ubuntu & Raspbian
-1. Follow the first few sets of instructions on the page below to install .NET 10 on Ubuntu and Raspbian
+1. Follow step 2 of the instructions at this link to install .NET 10 on Ubuntu and Raspbian
 https://learn.microsoft.com/en-us/dotnet/iot/deployment
 2. They both require installation of libusb-1.0 via
 ```bash

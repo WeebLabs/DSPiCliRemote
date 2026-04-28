@@ -1,0 +1,12 @@
+
+Install .net 10 by using these instructions:
+https://learn.microsoft.com/en-us/dotnet/iot/deployment
+
+For testing, install jetbrains rider using snap 
+https://snapcraft.io/install/rider/raspbian
+
+Install libusb via: sudo apt install libusb-1.0-0-dev
+
+
+
+
