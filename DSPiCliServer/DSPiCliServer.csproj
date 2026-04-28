@@ -19,4 +19,9 @@
       <ProjectReference Include="..\DSPiConsole.Core\DSPiConsole.Core.csproj" />
       <ProjectReference Include="..\DSPiConsole.Usb\DSPiConsole.Usb.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Services\StatsViewModel.cs" />
+      <None Include="Services\StatsViewModel.cs" />
+    </ItemGroup>
 </Project>

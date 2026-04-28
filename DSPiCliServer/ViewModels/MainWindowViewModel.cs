@@ -60,7 +60,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     public void OnErrorMessage(DeviceManager devService, object? sender, EventArgs e)
     {
-        //var ErrorMessage = devService.MyDevice.ErrorMessage;
+       Console.WriteLine(devService.MyDevice.ErrorMessage);
     }
 
     private void OnConnected(DeviceManager devService, object? sender, EventArgs e)

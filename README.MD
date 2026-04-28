@@ -3,12 +3,16 @@ MZachmann
 
 This is a tiny web page provider intended to work with the [WeebLabs DSPi project](https://github.com/WeebLabs/DSPi) that provides a quick gui via web browser.
 
+### To prepare to run it:
+* install .NET 10 if you haven't already (see below)
+* download the latest release (zip file) from the [releases page](https://github.com/MZachmann/DSPiCliRemote/releases)
+* * unzip that into a folder
+
 ### To run it:
-* download the latest release from the [releases page](https://github.com/MZachmann/DSPiCliRemote/releases)
-* install .NET 10 if you haven't already
-* unzip the archive into a folder
-* run the server and it should start listening then sit there
-* run a browser and go to http://yourip:yourport
+* in that folder, run the server 
+* it should print a few lines about which ports you've picked 
+then it starts listening and just sits there
+* run a browser and go to http://yourip:yourport to see the web page
 
 ### To build it:
 * open the solution in Visual Studio or JetBrains Rider
@@ -19,7 +23,6 @@ This is a tiny web page provider intended to work with the [WeebLabs DSPi projec
 The **Server** is a small (about 5MB currently) console application that runs in Windows, 
 Mac, and Linux. Install/run it on the computer driving the DSPi Pico USB port. It takes very few resources.
 
-Web View
 ![web](./Images/Gui001.png)
 
 The Server listens to two network ports (your choice which) and 
@@ -32,11 +35,37 @@ Mac, and Linux. It should run on any desktop (Windows, Mac, Linux). It has a sma
 user interface that lets you send text queries and commands to the DSPi Pico and get text results. 
 It also has a secondary Window with a display like the web page.
 
-### Notes
+### non-Windows Operating System Installations
+All of these use the labeled zips and (except Mac) need to make the program executable.
+
 #### Mac OS X
-For Mac you will need to install the libusb-1.0.dylib library and ensure it is visible in the path. Homebrew (brew) works
-well for this: "brew install libusb".
-#### Linux
-The linux build is currently being tested. It runs but also needs some unclear fixup for talking to the DSPi usb port. When (if?) this is
-tested and running the two linux releases (x64 and arm64) will be added to the release.
+Start by installing .NET 10 from the web.
+Then install the libusb-1.0 library and ensure it is visible in the path.
+Use Homebrew (brew) to install it: "brew install libusb". Watch where it installs it.
+_I had to move the dylib file somewhere my stuff could find it so the app can control the Pico._
+
+After you try to run it, unblock it
+in the Privacy tab of the Security & Privacy settings and allow it to run/communicate.
+
+#### Ubuntu 
+Follow the first few sets of instructions on the page below to install .NET 10 on Ubuntu and Raspbian
+https://learn.microsoft.com/en-us/dotnet/iot/deployment
+then...
+
+On **Ubuntu** you have to add permission to the USB port hardware (which starts read-only).
+The simplest approach is to run this bash script below which will give your user read-write
+access to all USB devices.
+```bash
+# Create a group called usbwriters
+sudo groupadd usbwriters
+# Add you to the group
+sudo usermod -a -G usbwriters $USER
+# Allow access to the USB port by adding a rule granting the group access to the subsystem
+echo 'SUBSYSTEM=="usb", MODE="0666", GROUP="usbwriters"' | sudo tee /etc/udev/rules.d/99-usbwriters.rules
+# Reboot
+echo "Please reboot"
+```
+#### Raspbian
+**Raspbian** remains non-working for now. More investiation is needed. The Ubuntu instructions
+all work but it still does not find the Pico.
 

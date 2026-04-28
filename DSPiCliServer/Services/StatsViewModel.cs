@@ -3,9 +3,12 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using DSPiConsole.Core.Models;
 using DSPiConsole.Usb;
 
+// !! note this is set to not compile
+// none of this code is used but it's a reference for me or an AI to scan through to create
+// helper functions. It is code from DSPiConsole
 
 namespace DSPiCliServer.Services;
-
+//#if false
 public partial class StatsViewModel : ObservableObject, IDisposable
 {
     private readonly DspDevice _device;
@@ -192,3 +195,4 @@ public partial class StatsViewModel : ObservableObject, IDisposable
         GC.SuppressFinalize(this);
     }
 }
+// #endif // false test
