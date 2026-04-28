@@ -37,7 +37,7 @@ public partial class MainWindowViewModel : ObservableObject
         
         _server.Start();
 
-        _httpServer = new HttpServerService(_server, httpPort);
+        _httpServer = new HttpServerService(httpPort);
         _httpServer.OnLog += msg =>
         {
             Dispatcher.UIThread.Post(() =>

@@ -18,12 +18,6 @@ The Server listens to two network ports (your choice which) and
   **web server that provides a one page GUI** to adjust volume, loudness and presets
 * the second port allows **CLI clients** to attach for freeform text commanding.
 
-### The Optional Client
-The _optional_ **Client** is a smallish .NET Core / Amazonia application that runs in Windows,
-Mac, and Linux. It should run on any desktop (Windows, Mac, Linux). It has a small
-user interface that lets you send text queries and commands to the DSPi Pico and get text results.
-It also has a secondary Window with a display like the web page.
-
 ### To prepare to run it:
 * install .NET 10 if you haven't already (see below)
 * download the latest release (zip file) from the [releases page](https://github.com/MZachmann/DSPiCliRemote/releases)

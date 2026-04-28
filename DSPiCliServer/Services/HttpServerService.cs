@@ -15,14 +15,12 @@ public class HttpServerService
     private readonly int _port;
     private TcpListener? _listener;
     private CancellationTokenSource? _cts;
-    private readonly TcpServerService _tcpService;
     private string _localIp = "Unknown";
 
     public event Action<string>? OnLog;
 
-    public HttpServerService(TcpServerService tcpService, int port = 80)
+    public HttpServerService(int port = 80)
     {
-        _tcpService = tcpService;
         _port = port;
     }
 
@@ -299,7 +297,7 @@ public class HttpServerService
 
     private string InvokeTcpProcessCommand(string command)
     {
-        return _tcpService.ProcessCommandPublic(command);
+        return CommandParser.ProcessCommandPublic(command);
     }
 
 }
