@@ -1,7 +1,6 @@
 obj/
 bin/
 .vs/
-./Documentation
 DSPiConsole.Usb/
 DSPiConsole.Core/
 

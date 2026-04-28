@@ -1,0 +1,99 @@
+namespace DSPiCliServer.Services;
+
+public static class HtmlPages
+{
+    
+    public static string GetIndexHtml(string ipAddress)
+    {
+        return @$"<!DOCTYPE html>
+<html>
+<head>
+    <title>DSPi Web Control</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <style>
+        body {{ font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; background: #f0f0f0; }}
+        .card {{ background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }}
+        .control-group {{ margin-bottom: 15px; }}
+        .btn-row {{ display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }}
+        label {{ display: block; margin-bottom: 5px; font-weight: bold; }}
+        input[type=range] {{ width: 100%; }}
+        button {{ padding: 10px 20px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }}
+        button:hover {{ background: #0056b3; }}
+        .status {{ font-size: 0.9em; color: #666; margin-top: 10px; }}
+        #log {{ height: 100px; overflow-y: scroll; background: #eee; padding: 10px; font-family: monospace; font-size: 0.8em; }}
+    </style>
+</head>
+<body>
+    <div class='card'>
+        <h2>DSPi Web Control</h2>
+        <div class='control-group'>
+            <label>Master Volume: <span id='volLabel'>0.0</span> dB</label>
+            <input type='range' id='volSlider' min='-100' max='12' step='0.5' value='0'>
+        </div>
+        <div class='btn-row'>
+            <button id='loudnessBtn'>Loudness: OFF</button>
+            <button id='levelingBtn'>Leveling: OFF</button>
+            <button id='crossfeedBtn'>Crossfeed: OFF</button>
+        </div>
+        <div class='control-group'>
+            <label for='presetSelect'>Preset:</label>
+            <select id='presetSelect' style='width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;'>
+                <option value='-1'>Loading...</option>
+            </select>
+        </div>
+        <div class='control-group'>
+            <button id='refreshBtn'>Refresh Status</button>
+            <button id='cliBtn' style='background: #28a745;'>CLI</button>
+        </div>
+        <div class='status'>
+            <div>Sample Rate: <span id='srText'>-</span></div>
+            <div>Device ID: <span id='idText'>-</span></div>
+            <div style='margin-top: 10px; font-weight: bold;'>Server IP: {ipAddress}</div>
+        </div>
+    </div>
+    <div class='card'>
+        <h3>Log</h3>
+        <div id='log'></div>
+    </div>
+
+    <script src='/js/script.js'></script>
+    <script>
+        document.getElementById('cliBtn').onclick = () => window.location.href = '/cli';
+    </script>
+</body>
+</html>";
+    }
+
+    public static string GetCliHtml()
+    {
+        return @$"<!DOCTYPE html>
+<html>
+<head>
+    <title>DSPi CLI</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <style>
+        body {{ font-family: sans-serif; padding: 20px; max-width: 800px; margin: auto; background: #f0f0f0; }}
+        .card {{ background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; flex-direction: column; height: 90vh; }}
+        #cliOutput {{ flex-grow: 1; overflow-y: scroll; background: #222; color: #0f0; padding: 10px; font-family: monospace; font-size: 0.9em; margin-bottom: 15px; border-radius: 4px; }}
+        .input-row {{ display: flex; gap: 10px; }}
+        input {{ flex-grow: 1; padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-family: monospace; }}
+        button {{ padding: 10px 20px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }}
+        button:hover {{ background: #0056b3; }}
+        #backBtn {{ background: #6c757d; margin-bottom: 10px; align-self: flex-start; }}
+    </style>
+</head>
+<body>
+    <div class='card'>
+        <button id='backBtn'>&larr; Back</button>
+        <h2>DSPi CLI</h2>
+        <div id='cliOutput'></div>
+        <div class='input-row'>
+            <input type='text' id='cliInput' placeholder='Enter command...' autofocus>
+            <button id='sendBtn'>Send</button>
+        </div>
+    </div>
+    <script src='/js/cli.js'></script>
+</body>
+</html>";
+    }
+}
