@@ -159,9 +159,17 @@ public class HttpServerService
                 {
                     await ServeIndexHtml(stream);
                 }
+                else if (path == "/cli" && method == "GET")
+                {
+                    await ServeCliHtml(stream);
+                }
                 else if (path == "/js/script.js" && method == "GET")
                 {
                     await ServeStaticFile(stream, "wwwroot/js/script.js", "text/javascript");
+                }
+                else if (path == "/js/cli.js" && method == "GET")
+                {
+                    await ServeStaticFile(stream, "wwwroot/js/cli.js", "text/javascript");
                 }
                 else
                 {
@@ -225,6 +233,12 @@ public class HttpServerService
     private async Task ServeIndexHtml(Stream stream)
     {
         string html = GetIndexHtml(_localIp);
+        await SendResponseAsync(stream, 200, "OK", "text/html", html);
+    }
+
+    private async Task ServeCliHtml(Stream stream)
+    {
+        string html = GetCliHtml();
         await SendResponseAsync(stream, 200, "OK", "text/html", html);
     }
 
@@ -328,6 +342,7 @@ public class HttpServerService
         </div>
         <div class='control-group'>
             <button id='refreshBtn'>Refresh Status</button>
+            <button id='cliBtn' style='background: #28a745;'>CLI</button>
         </div>
         <div class='status'>
             <div>Sample Rate: <span id='srText'>-</span></div>
@@ -341,6 +356,42 @@ public class HttpServerService
     </div>
 
     <script src='/js/script.js'></script>
+    <script>
+        document.getElementById('cliBtn').onclick = () => window.location.href = '/cli';
+    </script>
+</body>
+</html>";
+    }
+
+    private string GetCliHtml()
+    {
+        return @$"<!DOCTYPE html>
+<html>
+<head>
+    <title>DSPi CLI</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <style>
+        body {{ font-family: sans-serif; padding: 20px; max-width: 800px; margin: auto; background: #f0f0f0; }}
+        .card {{ background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; flex-direction: column; height: 90vh; }}
+        #cliOutput {{ flex-grow: 1; overflow-y: scroll; background: #222; color: #0f0; padding: 10px; font-family: monospace; font-size: 0.9em; margin-bottom: 15px; border-radius: 4px; }}
+        .input-row {{ display: flex; gap: 10px; }}
+        input {{ flex-grow: 1; padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-family: monospace; }}
+        button {{ padding: 10px 20px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }}
+        button:hover {{ background: #0056b3; }}
+        #backBtn {{ background: #6c757d; margin-bottom: 10px; align-self: flex-start; }}
+    </style>
+</head>
+<body>
+    <div class='card'>
+        <button id='backBtn'>&larr; Back</button>
+        <h2>DSPi CLI</h2>
+        <div id='cliOutput'></div>
+        <div class='input-row'>
+            <input type='text' id='cliInput' placeholder='Enter command...' autofocus>
+            <button id='sendBtn'>Send</button>
+        </div>
+    </div>
+    <script src='/js/cli.js'></script>
 </body>
 </html>";
     }
