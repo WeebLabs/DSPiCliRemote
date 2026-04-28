@@ -41,10 +41,13 @@ All of these use the labeled zips and (except Mac) need to make the program exec
 #### Mac OS X
 Start by installing .NET 10 from the web.
 Then install the libusb-1.0 library and ensure it is visible in the path.
-Use Homebrew (brew) to install it: "brew install libusb". Watch where it installs it.
-_I had to move the dylib file somewhere my stuff could find it so the app can control the Pico._
+Use Homebrew (brew) to install it: "brew install libusb".
 
-After you try to run it, unblock it
+On my mac it installed in /opt/homebrew/Cellar/libusb and to ensure dotnet found it I finally
+just put a copy of the dylib into /usr/local/share/dotnet/shared/Microsoft.NETCore.App/10.0.7, the 
+dotnet installation folder
+
+After you try to run the app, unblock it
 in the Privacy tab of the Security & Privacy settings and allow it to run/communicate.
 
 #### Ubuntu 
