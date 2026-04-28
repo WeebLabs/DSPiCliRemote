@@ -50,12 +50,14 @@ dotnet installation folder
 After you try to run the app, unblock it
 in the Privacy tab of the Security & Privacy settings and allow it to run/communicate.
 
-#### Ubuntu 
-Follow the first few sets of instructions on the page below to install .NET 10 on Ubuntu and Raspbian
+#### Ubuntu & Raspbian
+1. Follow the first few sets of instructions on the page below to install .NET 10 on Ubuntu and Raspbian
 https://learn.microsoft.com/en-us/dotnet/iot/deployment
-then...
-
-On **Ubuntu** you have to add permission to the USB port hardware (which starts read-only).
+2. They both require installation of libusb-1.0 via
+```bash
+sudo apt install libusb-1.0-0-dev 
+```
+3. The USB ports in Linux start read-only so you have to add permission to the USB port hardware.
 The simplest approach is to run this bash script below which will give your user read-write
 access to all USB devices.
 ```bash
@@ -68,7 +70,5 @@ echo 'SUBSYSTEM=="usb", MODE="0666", GROUP="usbwriters"' | sudo tee /etc/udev/ru
 # Reboot
 echo "Please reboot"
 ```
-#### Raspbian
-**Raspbian** remains non-working for now. More investiation is needed. The Ubuntu instructions
-all work but it still does not find the Pico.
+That should be the prerequisites.
 
