@@ -4,6 +4,26 @@ MZachmann
 This is a tiny web page provider intended to work with the [WeebLabs DSPi project](https://github.com/WeebLabs/DSPi) that provides a quick 
 gui via web browser.
 
+### What is it?
+
+The **Server** is a small (about 5MB currently) console application that runs in Windows,
+Mac, and Linux (Ubuntu and Raspbian are tested).
+
+Install/run it on the computer driving the DSPi Pico USB port. It takes very few resources.
+
+![web](./Images/Gui001.png)
+
+The Server listens to two network ports (your choice which) and
+* the first port has a simple
+  **web server that provides a one page GUI** to adjust volume, loudness and presets
+* the second port allows **CLI clients** to attach for freeform text commanding.
+
+### The Optional Client
+The _optional_ **Client** is a smallish .NET Core / Amazonia application that runs in Windows,
+Mac, and Linux. It should run on any desktop (Windows, Mac, Linux). It has a small
+user interface that lets you send text queries and commands to the DSPi Pico and get text results.
+It also has a secondary Window with a display like the web page.
+
 ### To prepare to run it:
 * install .NET 10 if you haven't already (see below)
 * download the latest release (zip file) from the [releases page](https://github.com/MZachmann/DSPiCliRemote/releases)
@@ -18,25 +38,6 @@ then it starts listening and just sits there
 ### To build it:
 * open the solution in Visual Studio or JetBrains Rider
 * copy the two DSPi project (DSPiConsole.Usb and DSPiConsole.Core) into the solution folder
-
-### What is it?
-
-The **Server** is a small (about 5MB currently) console application that runs in Windows, 
-Mac, and Linux (Ubuntu and Raspbian are tested).
-
-Install/run it on the computer driving the DSPi Pico USB port. It takes very few resources.
-
-![web](./Images/Gui001.png)
-
-The Server listens to two network ports (your choice which) and 
-* the first port has a simple 
-**web server that provides a one page GUI** to adjust volume, loudness and presets
-* the second port allows **CLI clients** to attach for freeform text commanding.
-
-The _optional_ **Client** is a smallish .NET Core / Amazonia application that runs in Windows, 
-Mac, and Linux. It should run on any desktop (Windows, Mac, Linux). It has a small 
-user interface that lets you send text queries and commands to the DSPi Pico and get text results. 
-It also has a secondary Window with a display like the web page.
 
 ### non-Windows Operating System Installations
 All of these use the labeled zips and (except Mac) need to make the program executable.
