@@ -144,7 +144,13 @@ public class HttpServerService
                 }
 
                 // 3. Route request
-                //Console.WriteLine($"HTTP Request: {method} {path}");
+                if (method == "OPTIONS")
+                {
+                    await SendOptionsResponse(stream);
+                    return;
+                }
+
+                OnLog?.Invoke($"HTTP {method} {path}");
                 if (path == "/api/command" && method == "POST")
                 {
                     await HandleApiCommand(stream, headers, reader, ct);
@@ -152,6 +158,10 @@ public class HttpServerService
                 else if ((path == "/" || path == "/index.html") && method == "GET")
                 {
                     await ServeIndexHtml(stream);
+                }
+                else if (path == "/js/script.js" && method == "GET")
+                {
+                    await ServeStaticFile(stream, "wwwroot/js/script.js", "text/javascript");
                 }
                 else
                 {
@@ -169,6 +179,20 @@ public class HttpServerService
                 catch { /* Ignore */ }
             }
         }
+    }
+
+    private async Task SendOptionsResponse(Stream stream)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.Append("HTTP/1.1 204 No Content\r\n");
+        sb.Append("Access-Control-Allow-Origin: *\r\n");
+        sb.Append("Access-Control-Allow-Methods: POST, GET, OPTIONS\r\n");
+        sb.Append("Access-Control-Allow-Headers: Content-Type\r\n");
+        sb.Append("Connection: close\r\n");
+        sb.Append("\r\n");
+        byte[] bytes = Encoding.UTF8.GetBytes(sb.ToString());
+        await stream.WriteAsync(bytes, 0, bytes.Length);
+        await stream.FlushAsync();
     }
 
     private async Task HandleApiCommand(Stream stream, System.Collections.Generic.Dictionary<string, string> headers, StreamReader reader, CancellationToken ct)
@@ -204,6 +228,44 @@ public class HttpServerService
         await SendResponseAsync(stream, 200, "OK", "text/html", html);
     }
 
+    private async Task ServeStaticFile(Stream stream, string relativePath, string contentType)
+    {
+        try
+        {
+            // Normalize path for the current OS
+            string normalizedPath = relativePath.Replace('/', Path.DirectorySeparatorChar);
+            
+            string fullPath = Path.Combine(AppContext.BaseDirectory, normalizedPath);
+            if (!File.Exists(fullPath))
+            {
+                // Try project root if in dev
+                fullPath = Path.Combine(Directory.GetCurrentDirectory(), normalizedPath);
+                if (!File.Exists(fullPath))
+                {
+                    // Try one more level up or explicit folder
+                    fullPath = Path.Combine(Directory.GetCurrentDirectory(), "DSPiCliServer", normalizedPath);
+                }
+            }
+
+            if (File.Exists(fullPath))
+            {
+                OnLog?.Invoke($"Serving file: {fullPath}");
+                string content = await File.ReadAllTextAsync(fullPath);
+                await SendResponseAsync(stream, 200, "OK", contentType, content);
+            }
+            else
+            {
+                OnLog?.Invoke($"File not found: {relativePath} (Searched in {AppContext.BaseDirectory} and {Directory.GetCurrentDirectory()})");
+                await SendResponseAsync(stream, 404, "Not Found", "text/plain", $"File not found: {relativePath}");
+            }
+        }
+        catch (Exception ex)
+        {
+            OnLog?.Invoke($"Error serving static file: {ex.Message}");
+            await SendResponseAsync(stream, 500, "Internal Server Error", "text/plain", ex.Message);
+        }
+    }
+
     private async Task SendResponseAsync(Stream stream, int statusCode, string statusText, string contentType, string content)
     {
         byte[] contentBytes = Encoding.UTF8.GetBytes(content);
@@ -211,6 +273,7 @@ public class HttpServerService
         sb.Append($"HTTP/1.1 {statusCode} {statusText}\r\n");
         sb.Append($"Content-Type: {contentType}\r\n");
         sb.Append($"Content-Length: {contentBytes.Length}\r\n");
+        sb.Append("Access-Control-Allow-Origin: *\r\n");
         sb.Append("Connection: close\r\n");
         sb.Append("\r\n");
 
@@ -277,148 +340,7 @@ public class HttpServerService
         <div id='log'></div>
     </div>
 
-    <script>
-        const volSlider = document.getElementById('volSlider');
-        const volLabel = document.getElementById('volLabel');
-        const loudnessBtn = document.getElementById('loudnessBtn');
-        const levelingBtn = document.getElementById('levelingBtn');
-        const crossfeedBtn = document.getElementById('crossfeedBtn');
-        const presetSelect = document.getElementById('presetSelect');
-        const refreshBtn = document.getElementById('refreshBtn');
-        const logDiv = document.getElementById('log');
-
-        async function sendCommand(cmd) {{
-            try {{
-                const response = await fetch('/api/command', {{
-                    method: 'POST',
-                    body: cmd
-                }});
-                const text = await response.text();
-                addLog(`Sent: ${{cmd}} | Received: ${{text}}`);
-                return text;
-            }} catch (err) {{
-                addLog(`Error: ${{err}}`);
-                return null;
-            }}
-        }}
-
-        function addLog(msg) {{
-            const entry = document.createElement('div');
-            entry.textContent = `[${{new Date().toLocaleTimeString()}}] ${{msg}}`;
-            logDiv.appendChild(entry);
-            logDiv.scrollTop = logDiv.scrollHeight;
-        }}
-
-        volSlider.oninput = () => volLabel.textContent = volSlider.value;
-        volSlider.onchange = async () => {{
-            await sendCommand(`set_vol ${{volSlider.value}}`);
-        }};
-
-        let isLoudness = false;
-        loudnessBtn.onclick = async () => {{
-            isLoudness = !isLoudness;
-            const res = await sendCommand(`set_loudness ${{isLoudness ? 1 : 0}}`);
-            if (res === 'OK') {{
-                loudnessBtn.textContent = `Loudness: ${{isLoudness ? 'ON' : 'OFF'}}`;
-            }} else {{
-                isLoudness = !isLoudness;
-            }}
-        }};
-
-        let isLeveling = false;
-        levelingBtn.onclick = async () => {{
-            isLeveling = !isLeveling;
-            const res = await sendCommand(`set_leveling ${{isLeveling ? 1 : 0}}`);
-            if (res === 'OK') {{
-                levelingBtn.textContent = `Leveling: ${{isLeveling ? 'ON' : 'OFF'}}`;
-            }} else {{
-                isLeveling = !isLeveling;
-            }}
-        }};
-
-        let isCrossfeed = false;
-        crossfeedBtn.onclick = async () => {{
-            isCrossfeed = !isCrossfeed;
-            const res = await sendCommand(`set_crossfeed ${{isCrossfeed ? 1 : 0}}`);
-            if (res === 'OK') {{
-                crossfeedBtn.textContent = `Crossfeed: ${{isCrossfeed ? 'ON' : 'OFF'}}`;
-            }} else {{
-                isCrossfeed = !isCrossfeed;
-            }}
-        }};
-
-        presetSelect.onchange = async () => {{
-            const slot = presetSelect.value;
-            if (slot === '-1') return;
-            const res = await sendCommand(`set_preset ${{slot}}`);
-            if (res !== 'OK') {{
-                addLog('Failed to set preset');
-                await refreshPresets();
-            }}
-        }};
-
-        async function refreshPresets() {{
-            const presetsStr = await sendCommand('get_presets');
-            if (!presetsStr || presetsStr === 'Error' || presetsStr === 'Not connected') {{
-                presetSelect.innerHTML = '<option value=""-1"">No Presets Found</option>';
-                return;
-            }}
-
-            const resParts = presetsStr.split('|');
-            const activeSlot = resParts[0];
-            const listStr = resParts[1];
-            presetSelect.innerHTML = '';
-            
-            if (listStr) {{
-                const items = listStr.split(',');
-                for (const item of items) {{
-                    const itemParts = item.split(':');
-                    const slot = itemParts[0];
-                    const name = itemParts[1];
-                    const opt = document.createElement('option');
-                    opt.value = slot;
-                    opt.textContent = name;
-                    if (slot === activeSlot) opt.selected = true;
-                    presetSelect.appendChild(opt);
-                }}
-            }} else {{
-                presetSelect.innerHTML = '<option value=""-1"">No Presets Found</option>';
-            }}
-        }}
-
-        async function refresh() {{
-            await refreshPresets();
-
-            const activePreset = await sendCommand('get_activepreset');
-            if (activePreset && !isNaN(parseInt(activePreset))) {{
-                presetSelect.value = activePreset;
-            }}
-
-            const vol = await sendCommand('get_vol');
-            if (!isNaN(parseFloat(vol))) {{
-                volSlider.value = vol;
-                volLabel.textContent = vol;
-            }}
-
-            const loudness = await sendCommand('get_loudness');
-            isLoudness = loudness.toLowerCase() === 'true';
-            loudnessBtn.textContent = `Loudness: ${{isLoudness ? 'ON' : 'OFF'}}`;
-
-            const leveling = await sendCommand('get_leveling');
-            isLeveling = leveling.toLowerCase() === 'true';
-            levelingBtn.textContent = `Leveling: ${{isLeveling ? 'ON' : 'OFF'}}`;
-
-            const crossfeed = await sendCommand('get_crossfeed');
-            isCrossfeed = crossfeed.toLowerCase() === 'true';
-            crossfeedBtn.textContent = `Crossfeed: ${{isCrossfeed ? 'ON' : 'OFF'}}`;
-
-            document.getElementById('srText').textContent = await sendCommand('get_samplerate') + ' Hz';
-            document.getElementById('idText').textContent = await sendCommand('get_deviceid');
-        }}
-
-        refreshBtn.onclick = refresh;
-        window.onload = refresh;
-    </script>
+    <script src='/js/script.js'></script>
 </body>
 </html>";
     }
