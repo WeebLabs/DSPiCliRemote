@@ -17,10 +17,9 @@ using less than 1% of the CPU.
 The **CLI** button switches to the CLI mode to let you type commands, such as set_str.
 
 The **Optical** button runs a script of your choice. While running, the button shows On. 
-Click it while On to kill the running process. By default it runs Optical.sh (or .bat or .ps1) if found in the
-app folder. If none of those are found the default is set to run Play -d for Mac OSX. See set_str.
-
-This is obviously a security concern. We won't pack any of those batch files with the apps - ever.
+Click it while On to kill the running process. By default it runs a user-created Optical.sh (or .bat or .ps1) 
+if found in the app folder.
+If none of those are found the default is set to run Play -d for Mac OSX. See set_str.
 
 The Server listens to two network ports (your choice which) and
 * the first port has a simple

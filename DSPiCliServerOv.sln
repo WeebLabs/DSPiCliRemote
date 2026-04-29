@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSPiConsole.Usb", "DSPiCons
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSPiCliServer", "DSPiCliServer\DSPiCliServer.csproj", "{B84D0A0C-6582-49CE-972E-48EB3FA9F57E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipeIt", "PipeIt\PipeIt.csproj", "{0442DFD3-42EE-473B-A09A-D09B565DF68E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{B84D0A0C-6582-49CE-972E-48EB3FA9F57E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B84D0A0C-6582-49CE-972E-48EB3FA9F57E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B84D0A0C-6582-49CE-972E-48EB3FA9F57E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0442DFD3-42EE-473B-A09A-D09B565DF68E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0442DFD3-42EE-473B-A09A-D09B565DF68E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0442DFD3-42EE-473B-A09A-D09B565DF68E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0442DFD3-42EE-473B-A09A-D09B565DF68E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
