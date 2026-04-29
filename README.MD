@@ -9,9 +9,18 @@ gui via web browser.
 The **Server** is a small (about 5MB currently) console application that runs in Windows,
 Mac, and Linux (Ubuntu and Raspbian are tested).
 
-Install/run it on the computer driving the DSPi Pico USB port. It takes very few resources.
+Install/run it on the computer driving the DSPi Pico USB port. It takes very few resources. Top on a PI5 shows it
+using less than 1% of the CPU.
 
 ![web](./Images/Gui001.png)
+
+The **CLI** button switches to the CLI mode to let you type commands, such as set_str.
+
+The **Optical** button runs a script of your choice. While running, the button shows On. 
+Click it while On to kill the running process. By default it runs Optical.sh (or .bat or .ps1) if found in the
+app folder. If none of those are found the default is set to run Play -d for Mac OSX. See set_str.
+
+This is obviously a security concern. We won't pack any of those batch files with the apps - ever.
 
 The Server listens to two network ports (your choice which) and
 * the first port has a simple

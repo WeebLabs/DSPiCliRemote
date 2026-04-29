@@ -31,8 +31,26 @@ public class HttpServerService
         try
         {
             _listener.Start();
-            OnLog?.Invoke($"HTTP Server (TcpListener) started on port {_port}...");
-            Console.WriteLine($"HTTP Server (TcpListener) started on port {_port}...");
+            OnLog?.Invoke($"HTTP Server started on port {_port}...");
+            Console.WriteLine($"HTTP Server started on port {_port}...");
+            
+            // Run CommandParser tests
+            // CommandParser.TestRun();
+
+            // Set default string based on available scripts
+            string storedStr = "Play -d";
+            List<(string name, string entry)> fnames = new() {("Optical.sh","./Optical.sh"), ("Optical.bat","Optical"), ("Optical.ps1","./Optical.ps1")};
+            foreach (var fname in fnames)
+            {
+                if (File.Exists(fname.name))
+                {
+                    storedStr = fname.entry;
+                    break;
+                }
+            }
+            CommandParser.ProcessCommandPublic($"set_str {storedStr}");
+            Console.WriteLine($"Default set_str procedure call: {storedStr}");
+
             Task.Run(() => ListenAsync(_cts!.Token));
         }
         catch (Exception ex)

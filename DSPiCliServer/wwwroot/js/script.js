@@ -6,6 +6,34 @@ const crossfeedBtn = document.getElementById('crossfeedBtn');
 const presetSelect = document.getElementById('presetSelect');
 const refreshBtn = document.getElementById('refreshBtn');
 const logDiv = document.getElementById('log');
+const opticalUsbBtn = document.getElementById('opticalUsbBtn');
+const opticalStatus = document.getElementById('opticalStatus');
+
+let isProcessRunning = false;
+
+async function updateOpticalUsbButton() {
+    const res = await sendCommand('is_running');
+    isProcessRunning = (res === 'True');
+    
+    if (opticalStatus) {
+        opticalStatus.textContent = isProcessRunning ? 'ON' : 'OFF';
+        opticalStatus.style.color = isProcessRunning ? '#28a745' : '#dc3545';
+    }
+    
+    // Auto-poll while running
+    if (isProcessRunning) {
+        setTimeout(updateOpticalUsbButton, 2000);
+    }
+}
+
+opticalUsbBtn.onclick = async () => {
+    if (isProcessRunning) {
+        await sendCommand('kill_str');
+    } else {
+        await sendCommand('run_str');
+    }
+    await updateOpticalUsbButton();
+};
 
 async function sendCommand(cmd) {
     try {
@@ -134,6 +162,7 @@ async function refresh() {
 
     document.getElementById('srText').textContent = await sendCommand('get_samplerate') + ' Hz';
     document.getElementById('idText').textContent = await sendCommand('get_deviceid');
+    await updateOpticalUsbButton();
 }
 
 refreshBtn.onclick = refresh;

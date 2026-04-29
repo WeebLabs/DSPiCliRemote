@@ -44,6 +44,8 @@ public static class HtmlPages
         <div class='control-group'>
             <button id='refreshBtn'>Refresh Status</button>
             <button id='cliBtn' style='background: #28a745;'>CLI</button>
+            <button id='opticalUsbBtn' style='background: #fd7e14;'>Optical</button>
+            <span id='opticalStatus' style='font-weight: bold; margin-left: 5px;'>OFF</span>
         </div>
         <div class='status'>
             <div>Sample Rate: <span id='srText'>-</span></div>
