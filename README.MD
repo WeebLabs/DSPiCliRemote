@@ -43,24 +43,32 @@ then it starts listening and just sits there
 * open the solution in Visual Studio or JetBrains Rider
 * copy the two DSPi project (DSPiConsole.Usb and DSPiConsole.Core) into the solution folder
 
-### non-Windows Operating System Installations
+## non-Windows Operating System Installations
 All of these use the labeled zips and (except Mac) need to make the program executable.
 
-#### Mac OS X
+### Mac OS X
 Start by installing .NET 8 from the web.
 Then install the libusb-1.0 library and ensure it is visible in the path.
 Use Homebrew (brew) to install it: "brew install libusb".
 
 On my mac it installed in /opt/homebrew/Cellar/libusb and to ensure dotnet found it I finally
-just put a copy of the dylib into /usr/local/share/dotnet/shared/Microsoft.NETCore.App/10.0.7, the 
-dotnet installation folder
+just put a copy of the libusb-1.0.dylib into the DSPiCliRemote application folder
 
 After you try to run the app, unblock it
 in the Privacy tab of the Security & Privacy settings and allow it to run/communicate.
 
-#### Ubuntu & Raspbian
-1. Follow step 2 of the instructions at this link to install .NET 8 on Ubuntu and Raspbian
-https://learn.microsoft.com/en-us/dotnet/iot/deployment
+### Ubuntu & Raspbian
+1. Follow https://learn.microsoft.com/en-us/dotnet/core/install/linux to install .NET 8 or try this: https://learn.microsoft.com/en-us/dotnet/iot/deployment
+
+Or, these seem to be->
+```bash
+# install .net
+curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 8.0
+# put it in your path
+echo 'export DOTNET_ROOT=$HOME/.dotnet' >> ~/.bashrc
+echo 'export PATH=$PATH:$HOME/.dotnet' >> ~/.bashrc
+source ~/.bashrc
+```
 2. They both require installation of libusb-1.0 via
 ```bash
 sudo apt install libusb-1.0-0-dev 
