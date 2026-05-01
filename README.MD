@@ -59,8 +59,7 @@ After you try to run the app, unblock it
 in the Privacy tab of the Security & Privacy settings and allow it to run/communicate.
 
 #### Ubuntu & Raspbian
-1. Follow step 2 of the instructions at this link to install .NET 8 on Ubuntu and Raspbian
-https://learn.microsoft.com/en-us/dotnet/iot/deployment
+1. Follow https://learn.microsoft.com/en-us/dotnet/core/install/linux to install .NET 8
 2. They both require installation of libusb-1.0 via
 ```bash
 sudo apt install libusb-1.0-0-dev 
