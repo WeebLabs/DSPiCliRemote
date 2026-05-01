@@ -1,6 +1,6 @@
 use: sudo find / -type f -name "filename.txt" 2>/dev/null to find all files with a specific name
 
-in the folder /System/Volumes/Data/opt/homebrew/Cellar/libusb is where brew puts the libusb library
+in the folder /opt/homebrew/Cellar/libusb is where brew puts the libusb library
 in the ./libusb/1.0.29/lib subfolder is where the dylib actually lives
 
-I couldn't get it found by the app so finally copied it to /usr/local/share/dotnet/shared/Microsoft.NETCore.App/10.0.7
+I couldn't get it found by the app so finally copied it (libusb-1.0.dylib) to the executable folder

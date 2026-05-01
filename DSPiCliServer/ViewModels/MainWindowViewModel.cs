@@ -11,6 +11,8 @@ public partial class MainWindowViewModel : ObservableObject
 {
     private TcpServerService? _server;
     private HttpServerService? _httpServer;
+
+    public static string Version => "0.1";
     
     //private DspDevice? _dspDevice => DeviceManager.Instance.MyDevice;
 
@@ -22,29 +24,38 @@ public partial class MainWindowViewModel : ObservableObject
     
     public BulkParams? MyBulkParams { get; set; }
     
+  
     //private System.Timers.Timer? _pollTimer;
 
     private void StartServer(int port, int httpPort)
     {
-        _server = new TcpServerService(port);
-        _server.OnLog += msg => 
+        HtmlPages.LoadPages(AppContext.BaseDirectory);
+        if (string.IsNullOrEmpty(HtmlPages.GetIndexHtml("")))
         {
-            Dispatcher.UIThread.Post(() => 
-            {
-                Logs.Add($"[{DateTime.Now:T}] {msg}");
-            });
-        };
+            // Try project root if in dev
+            HtmlPages.LoadPages(Directory.GetCurrentDirectory());
+        }
+
+        _server = new TcpServerService(port);
+        // .NET 8 allergy?
+        // _server.OnLog += msg => 
+        // {
+        //     Dispatcher.UIThread.Post(() => 
+        //     {
+        //         Logs.Add($"[{DateTime.Now:T}] {msg}");
+        //     });
+        // };
         
         _server.Start();
 
         _httpServer = new HttpServerService(httpPort);
-        _httpServer.OnLog += msg =>
-        {
-            Dispatcher.UIThread.Post(() =>
-            {
-                Logs.Add($"[{DateTime.Now:T}] [HTTP] {msg}");
-            });
-        };
+        // _httpServer.OnLog += msg =>
+        // {
+        //     Dispatcher.UIThread.Post(() =>
+        //     {
+        //         Logs.Add($"[{DateTime.Now:T}] [HTTP] {msg}");
+        //     });
+        // };
         _httpServer.Start();
         
     }

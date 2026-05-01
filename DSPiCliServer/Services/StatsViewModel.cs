@@ -8,7 +8,7 @@ using DSPiConsole.Usb;
 // helper functions. It is code from DSPiConsole
 
 namespace DSPiCliServer.Services;
-//#if false
+#if false
 public partial class StatsViewModel : ObservableObject, IDisposable
 {
     private readonly DspDevice _device;
@@ -195,4 +195,4 @@ public partial class StatsViewModel : ObservableObject, IDisposable
         GC.SuppressFinalize(this);
     }
 }
-// #endif // false test
+#endif // false test

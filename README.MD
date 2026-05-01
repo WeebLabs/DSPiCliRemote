@@ -4,6 +4,8 @@ MZachmann
 This is a tiny web page provider intended to work with the [WeebLabs DSPi project](https://github.com/WeebLabs/DSPi) that provides a quick 
 gui via web browser.
 
+#### Note: this now uses .NET 8 rather than .NET 10 since the client app was removed.
+
 ### What is it?
 
 The **Server** is a small (about 5MB currently) console application that runs in Windows,
@@ -27,7 +29,7 @@ The Server listens to two network ports (your choice which) and
 * the second port allows **CLI clients** to attach for freeform text commanding.
 
 ### To prepare to run it:
-* install .NET 10 if you haven't already (see below)
+* install .NET 8 if you haven't already (see below)
 * download the latest release (zip file) from the [releases page](https://github.com/MZachmann/DSPiCliRemote/releases)
 * * unzip that into a folder
 
@@ -45,7 +47,7 @@ then it starts listening and just sits there
 All of these use the labeled zips and (except Mac) need to make the program executable.
 
 #### Mac OS X
-Start by installing .NET 10 from the web.
+Start by installing .NET 8 from the web.
 Then install the libusb-1.0 library and ensure it is visible in the path.
 Use Homebrew (brew) to install it: "brew install libusb".
 
@@ -57,7 +59,7 @@ After you try to run the app, unblock it
 in the Privacy tab of the Security & Privacy settings and allow it to run/communicate.
 
 #### Ubuntu & Raspbian
-1. Follow step 2 of the instructions at this link to install .NET 10 on Ubuntu and Raspbian
+1. Follow step 2 of the instructions at this link to install .NET 8 on Ubuntu and Raspbian
 https://learn.microsoft.com/en-us/dotnet/iot/deployment
 2. They both require installation of libusb-1.0 via
 ```bash

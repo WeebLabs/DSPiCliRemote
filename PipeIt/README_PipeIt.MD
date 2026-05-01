@@ -1,1 +1,3 @@
-This is a simple Mac application to pipe the standard audio input to the standard audio output at 96KHz. It's used personally but not really part of the project.
+This is a simple Mac application to pipe the standard audio input to the standard audio output at 96KHz. 
+
+It's used personally but not really part of the server.

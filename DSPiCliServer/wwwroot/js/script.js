@@ -22,7 +22,7 @@ async function updateOpticalUsbButton() {
     
     // Auto-poll while running
     if (isProcessRunning) {
-        setTimeout(updateOpticalUsbButton, 2000);
+        setTimeout(updateOpticalUsbButton, 5000);
     }
 }
 
