@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DSPiCliServer.Services;
@@ -18,15 +17,6 @@ public partial class MainWindowViewModel : ObservableObject
 
     public ObservableCollection<string> Logs { get; } = new();
     
-    public ObservableCollection<DSPiDeviceInfo> AvailableDevices { get; set; } = new();
-    
-    public bool IsDeviceConnected { get => DeviceManager.Instance.IsConnected; }
-    
-    public BulkParams? MyBulkParams { get; set; }
-    
-  
-    //private System.Timers.Timer? _pollTimer;
-
     private void StartServer(int port, int httpPort)
     {
         HtmlPages.LoadPages(AppContext.BaseDirectory);
@@ -88,7 +78,6 @@ public partial class MainWindowViewModel : ObservableObject
                 var parsed = BulkParamsParser.Parse(bulk);
                 if (parsed != null)
                 {
-                    //MyBulkParams = parsed;
                     var infos = $"Loudness={parsed.LoudnessEnabled}, PreampGain={parsed.PreampGainDb}";
                     TcpServerService.Server?.WriteClientAsync(infos).Wait();
                     return;
@@ -120,7 +109,7 @@ public partial class MainWindowViewModel : ObservableObject
             }
             else if (e.PropertyName == nameof(DspDevice.SelectedDeviceInfo))
             {
-                //var x = 12;
+
             }
         };
     }

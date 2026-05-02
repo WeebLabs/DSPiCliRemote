@@ -38,7 +38,7 @@ public class HttpServerService
             // CommandParser.TestRun();
 
             // Set default string based on available scripts
-            string storedStr = "Play -d";
+            string storedStr = "./PipeIt/PipeIt";
             List<(string name, string entry)> fnames = new() {("Optical.sh","./Optical.sh"), ("Optical.bat","Optical"), ("Optical.ps1","./Optical.ps1")};
             foreach (var fname in fnames)
             {
