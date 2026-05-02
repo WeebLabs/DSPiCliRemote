@@ -2,9 +2,9 @@
 MZachmann
 
 This is a tiny web page provider intended to work with the [WeebLabs DSPi project](https://github.com/WeebLabs/DSPi) that provides a quick 
-gui via web browser.
+gui via web browser as well as a REST interface.
 
-#### Note: this now uses .NET 8 rather than .NET 10 since the client app was removed.
+#### Note: this now requires .NET 8.
 
 ### What is it?
 
@@ -16,12 +16,25 @@ using less than 1% of the CPU.
 
 ![web](./Images/Gui001.png)
 
-The **CLI** button switches to the CLI mode to let you type commands, such as set_str.
+The **CLI** button switches to the CLI mode to let you type commands, such as set_str. The "help" command lists all commands.
 
 The **Optical** button runs a script of your choice. While running, the button shows On. 
 Click it while On to kill the running process. By default it runs a user-created Optical.sh (or .bat or .ps1) 
 if found in the app folder.
 If none of those are found the default is set to run Play -d for Mac OSX. See set_str.
+
+The REST interface lives at http://your_ip_address:your_port/api/ where you can send simple commands such
+as
+```bash
+http://1.2.3.4:8082/api/get_str 
+or
+http://myweb.com:8082/api/get_str
+```
+ and if the command has an argument just put a ? as delimiter. Such as
+```bash
+http://1.2.3.4:8082/api/set_str?my_new_string
+```
+
 
 The Server listens to two network ports (your choice which) and
 * the first port has a simple

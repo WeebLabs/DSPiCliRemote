@@ -171,6 +171,10 @@ public class HttpServerService
                 {
                     await HandleApiCommand(stream, headers, reader, ct);
                 }
+                else if (path.StartsWith("/api/") && method == "GET")
+                {
+                    await HandleApiGetCommand(stream, path, ct);
+                }
                 else if ((path == "/" || path == "/index.html") && method == "GET")
                 {
                     await ServeIndexHtml(stream);
@@ -243,6 +247,34 @@ public class HttpServerService
 
         string result = InvokeTcpProcessCommand(body);
         Console.WriteLine($"HTTP API Flow: {body}=>{result}");
+        await SendResponseAsync(stream, 200, "OK", "text/plain", result);
+    }
+
+    private async Task HandleApiGetCommand(Stream stream, string path, CancellationToken ct)
+    {
+        // Path is /api/some_command or /api/some_command?arg
+        string requestPath = path.Substring(5); // Remove "/api/"
+        
+        // If there's a '?', replace the first occurrence with a space to separate command and args
+        int queryIndex = requestPath.IndexOf('?');
+        string commandLine;
+        if (queryIndex != -1)
+        {
+            string cmd = requestPath.Substring(0, queryIndex);
+            string args = requestPath.Substring(queryIndex + 1);
+            commandLine = $"{cmd} {args}";
+        }
+        else
+        {
+            commandLine = requestPath;
+        }
+
+        commandLine = Uri.UnescapeDataString(commandLine);
+
+        OnLog?.Invoke($"HTTP API GET Received: {commandLine}");
+
+        string result = InvokeTcpProcessCommand(commandLine);
+        Console.WriteLine($"HTTP API GET Flow: {commandLine}=>{result}");
         await SendResponseAsync(stream, 200, "OK", "text/plain", result);
     }
 
