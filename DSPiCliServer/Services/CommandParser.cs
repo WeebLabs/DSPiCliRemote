@@ -43,6 +43,18 @@ public static class CommandParser
         Console.WriteLine("[TestRun] Testing is_running after kill...");
         string res5 = ProcessCommand("is_running");
         Console.WriteLine($"[TestRun] Result: {res5}");
+
+        Console.WriteLine("[TestRun] Testing help...");
+        string resHelp = ProcessCommand("help");
+        Console.WriteLine($"[TestRun] Result: {resHelp}");
+
+        Console.WriteLine("[TestRun] Testing get_input (mocked as not connected or error if no device)...");
+        string resGetInput = ProcessCommand("get_input");
+        Console.WriteLine($"[TestRun] Result: {resGetInput}");
+
+        Console.WriteLine("[TestRun] Testing set_input invalid...");
+        string resSetInputInv = ProcessCommand("set_input invalid");
+        Console.WriteLine($"[TestRun] Result: {resSetInputInv}");
         
         Console.WriteLine("[TestRun] CommandParser tests completed.");
     }
@@ -64,7 +76,7 @@ public static class CommandParser
                 "ping" => "pong",
                 "time" => DateTime.Now.ToString("T"),
                 "date" => DateTime.Now.ToString("d"),
-                "help" => "Available commands: ping, time, date, help, hello, get_vol, set_vol <db>, get_bypass, set_bypass <0/1>, get_loudness, set_loudness <0/1>, get_leveling, set_leveling <0/1>, get_crossfeed, set_crossfeed <0/1>, get_samplerate, get_deviceid, get_firmwareversion, get_activepreset, get_presets, set_preset, get_str, set_str <val>, run_str, kill_str, is_running",
+                "help" => "Available commands: ping, time, date, help, hello, get_vol, set_vol <db>, get_bypass, set_bypass <0/1>, get_loudness, set_loudness <0/1>, get_leveling, set_leveling <0/1>, get_crossfeed, set_crossfeed <0/1>, get_samplerate, get_deviceid, get_firmwareversion, get_activepreset, get_presets, set_preset, get_input, set_input <usb/spdif>, get_str, set_str <val>, run_str, kill_str, is_running",
                 "get_vol" => dv.IsConnected ? (dv.MyDevice.GetMasterVolume()?.ToString("F1") ?? "Error") : "Not connected",
                 "set_vol" => (dv.IsConnected && parts.Length > 1 && float.TryParse(parts[1], out float vol)) ? (dv.MyDevice.SetMasterVolume(vol) ? "OK" : "Error") : "Error",
                 "get_bypass" => dv.IsConnected ? (dv.MyDevice.GetBypass()?.ToString() ?? "Error") : "Not connected",
@@ -81,6 +93,8 @@ public static class CommandParser
                 "get_activepreset" => dv.IsConnected ? dv.MyDevice.GetActivePreset().ToString() : "Not connected",
                 "get_presets" => GetPresetsCommand(dv),
                 "set_preset" => (dv.IsConnected && parts.Length > 1 && int.TryParse(parts[1], out int slot)) ? (dv.MyDevice.LoadPreset(slot) == 0 ? "OK" : "Error") : "Error",
+                "get_input" => dv.IsConnected ? (dv.MyDevice.GetInputSource()?.ToString() ?? "Error") : "Not connected",
+                "set_input" => (dv.IsConnected && parts.Length > 1) ? (SetInputSource(dv, parts[1])) : "Error",
                 "get_str" => _storedString ?? "None",
                 "set_str" => SetStr(input),
                 "run_str" => RunStr(),
@@ -93,6 +107,19 @@ public static class CommandParser
         {
             return $"Error: {ex.Message}";
         }
+    }
+
+    private static string SetInputSource(DeviceManager dv, string sourceStr)
+    {
+        if (sourceStr.ToLower() == "usb")
+        {
+            return dv.MyDevice.SetInputSource(InputSource.Usb) ? "OK" : "Error";
+        }
+        else if (sourceStr.ToLower() == "spdif")
+        {
+            return dv.MyDevice.SetInputSource(InputSource.Spdif) ? "OK" : "Error";
+        }
+        return "Error: Invalid source. Use 'usb' or 'spdif'.";
     }
 
     private static string SetStr(string input)

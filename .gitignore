@@ -1,6 +1,7 @@
 obj/
 bin/
 .vs/
+.vshistory/
 DSPiConsole.Usb/
 DSPiConsole.Core/
 

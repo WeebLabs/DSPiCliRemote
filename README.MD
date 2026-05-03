@@ -16,12 +16,14 @@ using less than 1% of the CPU.
 
 ![web](./Images/Gui001.png)
 
-The **CLI** button switches to the CLI mode to let you type commands, such as set_str. The "help" command lists all commands.
+* The **USB** button lets you select between USB and SPDIF input sources.
 
-The **Optical** button runs a script of your choice. While running, the button shows On. 
+* The **CLI** button switches to the CLI mode to let you type commands, such as set_str. The "help" command lists all commands.
+
+* The **Script** button runs a script of your choice. While running, the button shows On. 
 Click it while On to kill the running process. By default it runs a user-created Optical.sh (or .bat or .ps1) 
 if found in the app folder.
-If none of those are found the default is set to run Play -d for Mac OSX. See set_str.
+If none of those are found the default is set to run PipeIt (pipe audio input to audio output) for Mac OSX. See set_str.
 
 The REST interface lives at http://your_ip_address:your_port/api/ where you can send simple commands such
 as
@@ -34,7 +36,6 @@ http://myweb.com:8082/api/get_str
 ```bash
 http://1.2.3.4:8082/api/set_str?my_new_string
 ```
-
 
 The Server listens to two network ports (your choice which) and
 * the first port has a simple

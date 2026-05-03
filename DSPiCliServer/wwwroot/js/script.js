@@ -8,6 +8,7 @@ const refreshBtn = document.getElementById('refreshBtn');
 const logDiv = document.getElementById('log');
 const opticalUsbBtn = document.getElementById('opticalUsbBtn');
 const opticalStatus = document.getElementById('opticalStatus');
+const inputBtn = document.getElementById('inputBtn');
 
 let isProcessRunning = false;
 
@@ -17,7 +18,11 @@ async function updateOpticalUsbButton() {
     
     if (opticalStatus) {
         opticalStatus.textContent = isProcessRunning ? 'ON' : 'OFF';
-        opticalStatus.style.color = isProcessRunning ? '#28a745' : '#dc3545';
+        opticalStatus.style.color = isProcessRunning ? '#28a745' : '#007bff';
+    }
+
+    if (opticalUsbBtn) {
+        opticalUsbBtn.style.background = isProcessRunning ? '#28a745' : '#007bff';
     }
     
     // Auto-poll while running
@@ -33,6 +38,16 @@ opticalUsbBtn.onclick = async () => {
         await sendCommand('run_str');
     }
     await updateOpticalUsbButton();
+};
+
+inputBtn.onclick = async () => {
+    const current = inputBtn.textContent;
+    const next = current === 'USB' ? 'spdif' : 'usb';
+    const res = await sendCommand(`set_input ${next}`);
+    if (res === 'OK') {
+        inputBtn.textContent = next.toUpperCase();
+        inputBtn.style.background = next === 'spdif' ? '#0056b3' : '#007bff';
+    }
 };
 
 async function sendCommand(cmd) {
@@ -162,6 +177,13 @@ async function refresh() {
 
     document.getElementById('srText').textContent = await sendCommand('get_samplerate') + ' Hz';
     document.getElementById('idText').textContent = await sendCommand('get_deviceid');
+    
+    const inputSource = await sendCommand('get_input');
+    if (inputSource === 'Usb' || inputSource === 'Spdif') {
+        inputBtn.textContent = inputSource.toUpperCase();
+        inputBtn.style.background = inputSource.toLowerCase() === 'spdif' ? '#0056b3' : '#007bff';
+    }
+
     await updateOpticalUsbButton();
 }
 
