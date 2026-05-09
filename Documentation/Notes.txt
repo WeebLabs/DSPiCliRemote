@@ -1,2 +1,4 @@
 It's important to not use the AnyCPU with the DSPiConsole.Usb library because the Platform
-selection for the project causes build to embed a libusb-0.1.dll (or dylib) in the output directory.  
+selection for the project causes build to embed a libusb-0.1.dll (or dylib) in the output directory.  Not to
+mention that in DSPiConsole itself the AnyCPU platform doesn't exist so we don't want to add it.
+

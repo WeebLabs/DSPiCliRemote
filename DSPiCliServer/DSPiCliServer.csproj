@@ -61,6 +61,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Content Include="Binary\CompressIt.bat" />
         <Content Include="Binary\libusb-1.0.dll" Condition="'$(Configuration)' != 'Releasex64'" />
         <Content Include="wwwroot\**">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

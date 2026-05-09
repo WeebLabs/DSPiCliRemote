@@ -65,8 +65,11 @@ All of these use the labeled zips and (except Mac) need to make the program exec
 ### Mac OS X
 Start by installing .NET 8 from the web.
 
-After you try to run the app, unblock it
-in the Privacy tab of the Security & Privacy settings and allow it to run/communicate.
+1. Get the DSPiCliRemote ZIP file from the repository Releases
+2. Run chmod +x on the application file (DSPiCliRemote) and if you want to use it, also on the PipeIt application file in the subfolder.
+3. Run the application file (DSPiCliRemote)
+
+After you try to run the app, unblock it in the Privacy tab of the Security & Privacy settings and allow it to run/communicate.
 
 ### Ubuntu & Raspbian
 1. Follow https://learn.microsoft.com/en-us/dotnet/core/install/linux to install .NET 8 or try this: https://learn.microsoft.com/en-us/dotnet/iot/deployment
@@ -97,5 +100,7 @@ echo 'SUBSYSTEM=="usb", MODE="0666", GROUP="usbwriters"' | sudo tee /etc/udev/ru
 # Reboot
 echo "Please reboot"
 ```
+4. Run chmod +x on the application file to allow executing it
+
 That should be the prerequisites.
 
