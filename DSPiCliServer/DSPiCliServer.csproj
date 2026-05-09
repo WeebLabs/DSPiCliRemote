@@ -7,6 +7,8 @@
         <Nullable>enable</Nullable>
         <AssemblyVersion>0.2</AssemblyVersion>
         <FileVersion>0.2</FileVersion>
+        <Configurations>Debug;Release;ReleaseX86;Releasex64;ReleaseArm64;Releaseoxxarm64</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -15,6 +17,30 @@
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
       <OutputPath>\tmp\DSPiCliServer\bin\Release</OutputPath>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'ReleaseArm64' ">
+      <OutputPath>\tmp\DSPiCliServer\bin\ReleaseArm64\</OutputPath>
+      <DefineConstants>TRACE; RELEASE</DefineConstants>
+      <Optimize>true</Optimize>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Releaseoxxarm64' ">
+      <OutputPath>\tmp\DSPiCliServer\bin\Releaseoxxarm64\</OutputPath>
+      <DefineConstants>TRACE; RELEASE</DefineConstants>
+      <Optimize>true</Optimize>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Releasex64' ">
+      <OutputPath>\tmp\DSPiCliServer\bin\Releasex64\</OutputPath>
+      <DefineConstants>TRACE; RELEASE</DefineConstants>
+      <Optimize>true</Optimize>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'ReleaseX86' ">
+      <OutputPath>\tmp\DSPiCliServer\bin\ReleaseX86\</OutputPath>
+      <DefineConstants>TRACE; RELEASE</DefineConstants>
+      <Optimize>true</Optimize>
     </PropertyGroup>
 
     <ItemGroup>
@@ -27,7 +53,15 @@
       <None Include="Services\StatsViewModel.cs" />
     </ItemGroup>
     
+    <ItemGroup Condition="'$(Configuration)' == 'Releasex64'">
+        <None Include="Binary\libusb-1.0.dll">
+            <Link>libusb-1.0.dll</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
     <ItemGroup>
+        <Content Include="Binary\libusb-1.0.dll" Condition="'$(Configuration)' != 'Releasex64'" />
         <Content Include="wwwroot\**">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>

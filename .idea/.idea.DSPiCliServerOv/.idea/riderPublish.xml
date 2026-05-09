@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="LocationsWithSilentDeleteHolder">
+    <option name="locations">
+      <list>
+        <option value="$PROJECT_DIR$/../../../../../tmp/build/DSPiCliRemote-LinuxX64" />
+        <option value="$PROJECT_DIR$/../../../../../tmp/build/DSPiCliRemote-Winx64" />
+        <option value="$PROJECT_DIR$/../../../../../tmp/build/DSPiCliRemote-MacOSX" />
+        <option value="$PROJECT_DIR$/../../../../../tmp/build/DSPiCliRemote-LinuxArm64" />
+      </list>
+    </option>
+  </component>
+</project>

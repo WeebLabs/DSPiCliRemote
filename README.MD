@@ -53,20 +53,17 @@ The Server listens to two network ports (your choice which) and
 then it starts listening and just sits there
 * run a browser and go to http://yourip:yourport to see the web page
 
-### To build it:
+### To build it: (not required)
 * open the solution in Visual Studio or JetBrains Rider
 * copy the two DSPi project (DSPiConsole.Usb and DSPiConsole.Core) into the solution folder
+* change the target of the two projects to .NET 8 instead of the framework 8
+* one file (Channel.cs) takes a minor change to include Windows.System .Color instead of Windows.IO .Color
 
 ## non-Windows Operating System Installations
 All of these use the labeled zips and (except Mac) need to make the program executable.
 
 ### Mac OS X
 Start by installing .NET 8 from the web.
-Then install the libusb-1.0 library and ensure it is visible in the path.
-Use Homebrew (brew) to install it: "brew install libusb".
-
-On my mac it installed in /opt/homebrew/Cellar/libusb and to ensure dotnet found it I finally
-just put a copy of the libusb-1.0.dylib into the DSPiCliRemote application folder
 
 After you try to run the app, unblock it
 in the Privacy tab of the Security & Privacy settings and allow it to run/communicate.

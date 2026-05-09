@@ -1,4 +1,5 @@
-﻿using DSPiCliServer.Services;
+﻿using System.Reflection;
+using DSPiCliServer.Services;
 using DSPiCliServer.ViewModels;
 using DSPiConsole.Usb;
 
@@ -8,10 +9,24 @@ sealed class Program
 {
     public static async Task Main(string[] args)
     {
-        Console.WriteLine("DSPi CLI Server starting...");
-        Console.WriteLine("Press Ctrl+C to stop the server.");
         Console.WriteLine("Syntax: DSPiCliServer [httpPort] [clientPort]");
         Console.WriteLine("Default: DSPiCliServer 8082 8084");
+        
+        // set the path to the current executable directory
+        // to ensure all dlls are loaded
+        string? exeDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        if(!string.IsNullOrEmpty(exeDir))
+        {
+            try
+            {
+                Directory.SetCurrentDirectory(exeDir);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
         
         int port = 8084;
         int httpPort = 8082;
@@ -23,6 +38,8 @@ sealed class Program
         {
             httpPort = customHttpPort;
         }
+        Console.WriteLine("DSPi CLI Server starting...");
+        Console.WriteLine("Press Ctrl+C to stop the server.");
         Console.WriteLine($"Using: DSPiCliServer http={httpPort} client={port}");
 
         // this starts everything up
@@ -30,15 +47,40 @@ sealed class Program
 
         Console.WriteLine("Press Ctrl+C to stop the server.");
 
-        var tcs = new TaskCompletionSource();
-        Console.CancelKeyPress += (s, e) =>
+        // var tcs = new TaskCompletionSource();
+        // Console.CancelKeyPress += (s, e) =>
+        // {
+        //     e.Cancel = true;
+        //     tcs.SetResult();
+        // };
+        //
+        // await tcs.Task;
+        bool exitRequested = false;
+        // Subscribe to the CancelKeyPress event
+        Console.CancelKeyPress += (sender, e) =>
         {
+            Console.WriteLine("\nCtrl+C detected. Cleaning up...");
+
+            // Prevent the process from terminating immediately
             e.Cancel = true;
-            tcs.SetResult();
+
+            // Set the exit flag
+            exitRequested = true;
         };
 
-        await tcs.Task;
-
+        // Main loop
+        int pick = 0;
+        while (!exitRequested)
+        {
+            // wait 3000ms and draw a .
+            if (6 <= pick++)
+            {
+                Console.Write(".");
+                pick = 0;
+            }
+            await Task.Delay(500);
+        }        
+        
         Console.WriteLine("Stopping server...");
         vm.StopServices();
     }
