@@ -72,16 +72,17 @@ Start by installing .NET 8 from the web.
 After you try to run the app, unblock it in the Privacy tab of the Security & Privacy settings and allow it to run/communicate.
 
 ### Ubuntu & Raspbian
-1. Follow https://learn.microsoft.com/en-us/dotnet/core/install/linux to install .NET 8 or try this: https://learn.microsoft.com/en-us/dotnet/iot/deployment
+1. I installed .NET 8 by going to the Microsoft site and following the instructions.
+    https://dotnet.microsoft.com/en-us/download/dotnet/8.0
 
-Or, these seem to be->
+    It replies with this page
+    https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.420-linux-arm64-binaries
+
+    And displays this script to install that version of it.
 ```bash
-# install .net
-curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 8.0
-# put it in your path
-echo 'export DOTNET_ROOT=$HOME/.dotnet' >> ~/.bashrc
-echo 'export PATH=$PATH:$HOME/.dotnet' >> ~/.bashrc
-source ~/.bashrc
+    mkdir -p $HOME/dotnet && tar zxf dotnet-sdk-8.0.420-linux-arm64.tar.gz -C $HOME/dotnet
+    export DOTNET_ROOT=$HOME/dotnet
+    export PATH=$PATH:$HOME/dotnet
 ```
 2. They both require installation of libusb-1.0 via
 ```bash
@@ -96,7 +97,7 @@ sudo groupadd usbwriters
 # Add you to the group
 sudo usermod -a -G usbwriters $USER
 # Allow access to the USB port by adding a rule granting the group access to the subsystem
-echo 'SUBSYSTEM=="usb", MODE="0666", GROUP="usbwriters"' | sudo tee /etc/udev/rules.d/99-usbwriters.rules
+echo 'SUBSYSTEM=="usb", MODE="0660", GROUP="usbwriters"' | sudo tee /etc/udev/rules.d/99-usbwriters.rules
 # Reboot
 echo "Please reboot"
 ```

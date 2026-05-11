@@ -1,6 +1,16 @@
-use: sudo find / -type f -name "filename.txt" 2>/dev/null to find all files with a specific name
+Start by installing .NET 8 from the web. I went here:
+    https://dotnet.microsoft.com/en-us/download/dotnet/8.0
+and as you download it displays installation instructions
 
-in the folder /opt/homebrew/Cellar/libusb is where brew puts the libusb library
-in the ./libusb/1.0.29/lib subfolder is where the dylib actually lives
+1. Get the DSPiCliRemote ZIP file from the repository Releases
+2. Unzip the file by double clicking on it.
+3. Move the folder to your Applications folder or wherever you want.
+4. Run chmod +x on the application file (DSPiCliRemote) and if you want to use it, also on the PipeIt application file in the subfolder.
+3. Run the application file (./DSPiCliRemote)
 
-I couldn't get it found by the app so finally copied it (libusb-1.0.dylib) to the executable folder
+After you try to run it the first time it will populate the Privacy tab of Security and Privacy settings where you can unblock it
+and then actually run it.
+
+The PipeIt application just runs flat out and pipes the audio input device to your audio output device (in my case the DSPi).
+
+

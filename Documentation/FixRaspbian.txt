@@ -1,12 +1,33 @@
+Raspbian Prerequisites
+---------------------------------------------
+I installed .NET 8 by going to the Microsoft site and following the instructions.
+    https://dotnet.microsoft.com/en-us/download/dotnet/8.0
+It replies with this page
+    https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.420-linux-arm64-binaries
 
-Install .net 10 by using these instructions:
-https://learn.microsoft.com/en-us/dotnet/iot/deployment
+And displays this script to install that version of it.
 
-For testing, install jetbrains rider using snap 
-https://snapcraft.io/install/rider/raspbian
+    mkdir -p $HOME/dotnet && tar zxf dotnet-sdk-8.0.420-linux-arm64.tar.gz -C $HOME/dotnet
+    export DOTNET_ROOT=$HOME/dotnet
+    export PATH=$PATH:$HOME/dotnet
 
-Install libusb via: sudo apt install libusb-1.0-0-dev
+2. Install libusb-1.0 via
 
+    sudo apt install libusb-1.0-0-dev
 
+3. The USB ports in Linux start read-only so you have to add permission to the USB port hardware.
+The simplest approach is to run this bash script below which will give your user read-write
+access to all USB devices.
 
+    # Create a group called usbwriters
+    sudo groupadd usbwriters
+    # Add you to the group
+    sudo usermod -a -G usbwriters $USER
+    # Allow access to the USB port by adding a rule granting the group access to the subsystem
+    echo 'SUBSYSTEM=="usb", MODE="0660", GROUP="usbwriters"' | sudo tee /etc/udev/rules.d/99-usbwriters.rules
+    # Reboot
+    echo "Please reboot"
 
+4. Run chmod +x on the application file to allow executing it
+
+That should be the prerequisites.
