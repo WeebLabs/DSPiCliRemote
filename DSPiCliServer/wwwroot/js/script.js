@@ -152,38 +152,53 @@ async function refreshPresets() {
 async function refresh() {
     await refreshPresets();
 
-    const activePreset = await sendCommand('get_activepreset');
-    if (activePreset && !isNaN(parseInt(activePreset))) {
-        presetSelect.value = activePreset;
+    const allStatus = await sendCommand('get_all');
+    if (allStatus && allStatus !== 'Error' && allStatus !== 'Not connected') {
+        const parts = allStatus.split(';');
+        const statusMap = {};
+        parts.forEach(p => {
+            const pair = p.split('=');
+            if (pair.length === 2) statusMap[pair[0]] = pair[1];
+        });
+
+        if (statusMap.preset && !isNaN(parseInt(statusMap.preset))) {
+            presetSelect.value = statusMap.preset;
+        }
+
+        if (statusMap.vol && !isNaN(parseFloat(statusMap.vol))) {
+            volSlider.value = statusMap.vol;
+            volLabel.textContent = statusMap.vol;
+        }
+
+        if (statusMap.loudness) {
+            isLoudness = statusMap.loudness === '1';
+            loudnessBtn.textContent = `Loudness: ${isLoudness ? 'ON' : 'OFF'}`;
+        }
+
+        if (statusMap.leveling) {
+            isLeveling = statusMap.leveling === '1';
+            levelingBtn.textContent = `Leveling: ${isLeveling ? 'ON' : 'OFF'}`;
+        }
+
+        if (statusMap.crossfeed) {
+            isCrossfeed = statusMap.crossfeed === '1';
+            crossfeedBtn.textContent = `Crossfeed: ${isCrossfeed ? 'ON' : 'OFF'}`;
+        }
+
+        if (statusMap.samplerate) {
+            document.getElementById('srText').textContent = statusMap.samplerate + ' Hz';
+        }
+
+        if (statusMap.input) {
+            const inputSource = statusMap.input;
+            if (inputSource === 'Usb' || inputSource === 'Spdif') {
+                inputBtn.textContent = inputSource.toUpperCase();
+                inputBtn.style.background = inputSource.toLowerCase() === 'spdif' ? '#0056b3' : '#007bff';
+            }
+        }
     }
 
-    const vol = await sendCommand('get_vol');
-    if (!isNaN(parseFloat(vol))) {
-        volSlider.value = vol;
-        volLabel.textContent = vol;
-    }
-
-    const loudness = await sendCommand('get_loudness');
-    isLoudness = loudness.toLowerCase() === 'true';
-    loudnessBtn.textContent = `Loudness: ${isLoudness ? 'ON' : 'OFF'}`;
-
-    const leveling = await sendCommand('get_leveling');
-    isLeveling = leveling.toLowerCase() === 'true';
-    levelingBtn.textContent = `Leveling: ${isLeveling ? 'ON' : 'OFF'}`;
-
-    const crossfeed = await sendCommand('get_crossfeed');
-    isCrossfeed = crossfeed.toLowerCase() === 'true';
-    crossfeedBtn.textContent = `Crossfeed: ${isCrossfeed ? 'ON' : 'OFF'}`;
-
-    document.getElementById('srText').textContent = await sendCommand('get_samplerate') + ' Hz';
     document.getElementById('idText').textContent = await sendCommand('get_deviceid');
-    
-    const inputSource = await sendCommand('get_input');
-    if (inputSource === 'Usb' || inputSource === 'Spdif') {
-        inputBtn.textContent = inputSource.toUpperCase();
-        inputBtn.style.background = inputSource.toLowerCase() === 'spdif' ? '#0056b3' : '#007bff';
-    }
-
     await updateOpticalUsbButton();
 }
 

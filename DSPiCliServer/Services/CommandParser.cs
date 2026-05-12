@@ -76,7 +76,7 @@ public static class CommandParser
                 "ping" => "pong",
                 "time" => DateTime.Now.ToString("T"),
                 "date" => DateTime.Now.ToString("d"),
-                "help" => "Available commands: ping, time, date, help, hello, get_vol, set_vol <db>, get_bypass, set_bypass <0/1>, get_loudness, set_loudness <0/1>, get_leveling, set_leveling <0/1>, get_crossfeed, set_crossfeed <0/1>, get_samplerate, get_deviceid, get_firmwareversion, get_activepreset, get_presets, set_preset, get_input, set_input <usb/spdif>, get_str, set_str <val>, run_str, kill_str, is_running",
+                "help" => "Available commands: ping, time, date, help, hello, get_all, get_vol, set_vol <db>, get_bypass, set_bypass <0/1>, get_loudness, set_loudness <0/1>, get_leveling, set_leveling <0/1>, get_crossfeed, set_crossfeed <0/1>, get_samplerate, get_deviceid, get_firmwareversion, get_activepreset, get_presets, set_preset, get_input, set_input <usb/spdif>, get_str, set_str <val>, run_str, kill_str, is_running",
                 "get_vol" => dv.IsConnected ? (dv.MyDevice.GetMasterVolume()?.ToString("F1") ?? "Error") : "Not connected",
                 "set_vol" => (dv.IsConnected && parts.Length > 1 && float.TryParse(parts[1], out float vol)) ? (dv.MyDevice.SetMasterVolume(vol) ? "OK" : "Error") : "Error",
                 "get_bypass" => dv.IsConnected ? (dv.MyDevice.GetBypass()?.ToString() ?? "Error") : "Not connected",
@@ -88,6 +88,7 @@ public static class CommandParser
                 "get_crossfeed" => dv.IsConnected ? (dv.MyDevice.GetCrossfeedEnabled()?.ToString() ?? "Error") : "Not connected",
                 "set_crossfeed" => (dv.IsConnected && parts.Length > 1) ? (dv.MyDevice.SetCrossfeedEnabled(parts[1] == "1") ? "OK" : "Error") : "Error",
                 "get_samplerate" => dv.IsConnected ? (dv.MyDevice.GetStatusUInt32(15)?.ToString() ?? "Error") : "Not connected", 
+                "get_all" => GetAllStatus(dv),
                 "get_deviceid" => dv.IsConnected ? (dv.MyDevice.GetDeviceSerial() ?? "Unknown") : "Not connected",
                 "get_firmwareversion" => dv.IsConnected ? (dv.MyDevice.GetDeviceInfo()?.FirmwareVersion ?? "Unknown") : "Not connected",
                 "get_activepreset" => dv.IsConnected ? dv.MyDevice.GetActivePreset().ToString() : "Not connected",
@@ -200,21 +201,57 @@ public static class CommandParser
         }
     }
     
+    private static string GetAllStatus(DeviceManager dv)
+    {
+        if (!dv.IsConnected) return "Not connected";
+
+        var bulk = dv.MyDevice.GetAllParams();
+        if (bulk == null) return "Error: Failed to fetch params";
+
+        var parsed = BulkParamsParser.Parse(bulk);
+        if (parsed == null) return "Error: Failed to parse params";
+
+        var sb = new StringBuilder();
+        // Master Volume (prefer BulkParams value if available, but DspDevice has it too)
+        float? vol = parsed.HasMasterVolume ? parsed.MasterVolumeDb : dv.MyDevice.GetMasterVolume();
+        sb.Append("vol=").Append(vol?.ToString("F1") ?? "Error").Append(';');
+
+        // Input Source
+        string input = parsed.HasInputConfig ? (parsed.InputSource == 0 ? "Usb" : "Spdif") : (dv.MyDevice.GetInputSource()?.ToString() ?? "Error");
+        sb.Append("input=").Append(input).Append(';');
+
+        // Bypass
+        sb.Append("bypass=").Append(parsed.Bypass ? "1" : "0").Append(';');
+
+        // Loudness
+        sb.Append("loudness=").Append(parsed.LoudnessEnabled ? "1" : "0").Append(';');
+
+        // Leveling
+        sb.Append("leveling=").Append(parsed.LevellerEnabled ? "1" : "0").Append(';');
+
+        // Crossfeed
+        sb.Append("crossfeed=").Append(parsed.CrossfeedEnabled ? "1" : "0").Append(';');
+
+        // Preamp (Global)
+        sb.Append("preamp=").Append(parsed.PreampGainDb.ToString("F1")).Append(';');
+
+        // Active Preset
+        int active = dv.MyDevice.GetActivePreset();
+        sb.Append("preset=").Append(active).Append(';');
+
+        // Sample Rate (still needs a status call, but it's okay)
+        uint? rate = dv.MyDevice.GetStatusUInt32(15);
+        sb.Append("samplerate=").Append(rate?.ToString() ?? "0");
+
+        return sb.ToString();
+    }
+
     private static string DoHello()
     {
         var dv = DeviceManager.Instance;
         if (dv.IsConnected)
         {
-            var bks = dv.MyDevice.GetAllParams();
-            if(bks == null) 
-                return "Not connected";
-            var parsed = BulkParamsParser.Parse(bks);
-            if (parsed != null)
-            {
-                //MyBulkParams = parsed;
-                var infos = $"Loudness={parsed.LoudnessEnabled}, PreampGain={parsed.PreampGainDb}";
-                return infos;
-            }
+            return GetAllStatus(dv);
         }
         return "Not connected";
     }

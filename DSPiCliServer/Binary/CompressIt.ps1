@@ -1,4 +1,8 @@
-Compress-Archive -Force -Path 'DSPiCliremote-Winx64' -DestinationPath 'DSPiCliremote-Winx64.zip'
-Compress-Archive -Force -Path 'DSPiCliremote-MacOSX' -DestinationPath 'DSPiCliremote-MacOSX.zip'
-Compress-Archive -Force -Path 'DSPiCliremote-LinuxX64' -DestinationPath 'DSPiCliremote-LinuxX64.zip'
-Compress-Archive -Force -Path 'DSPiCliremote-LinuxArm64' -DestinationPath 'DSPiCliremote-LinuxArm64.zip'
+del DSPiCliremote-Winx64.zip
+del DSPiCliremote-MacOSX.zip
+del DSPiCliremote-LinuxX64.zip
+del DSPiCliremote-LinuxArm64.zip 
+7z A "DSPiCliremote-Winx64.zip" "DSPiCliremote-Winx64"
+7z A "DSPiCliremote-MacOSX.zip" "DSPiCliremote-MacOSX"
+7z A "DSPiCliremote-LinuxX64.zip" "DSPiCliremote-LinuxX64"
+7z A "DSPiCliremote-LinuxArm64.zip" "DSPiCliremote-LinuxArm64" 
