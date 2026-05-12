@@ -11,7 +11,7 @@ public partial class MainWindowViewModel : ObservableObject
     private TcpServerService? _server;
     private HttpServerService? _httpServer;
 
-    public static string Version => "0.1";
+    public static string Version => "0.2";
     
     //private DspDevice? _dspDevice => DeviceManager.Instance.MyDevice;
 
