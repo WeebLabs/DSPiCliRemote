@@ -1,4 +1,3 @@
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DSPiConsole.Core.Models;
 using DSPiConsole.Usb;
