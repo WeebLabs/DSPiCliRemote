@@ -81,8 +81,8 @@ After you try to run the app, unblock it in the Privacy tab of the Security & Pr
     And displays this script to install that version of it.
 ```bash
     mkdir -p $HOME/dotnet && tar zxf dotnet-sdk-8.0.420-linux-arm64.tar.gz -C $HOME/dotnet
-    echo "export DOTNET_ROOT=\$HOME/dotnet" >>.bashrc
-    echo "export PATH=\$PATH:\$HOME/dotnet:\$HOME/dotnet/tools" >>.bashrc
+    echo "export DOTNET_ROOT=\$HOME/dotnet" >>~/.bashrc
+    echo "export PATH=\$PATH:\$HOME/dotnet:\$HOME/dotnet/tools" >>~/.bashrc
     source ~/.bashrc
 ```
 2. They both require installation of libusb-1.0 via
