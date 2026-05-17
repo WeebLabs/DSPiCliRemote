@@ -144,32 +144,8 @@ public static class CommandParser
             catch { return "Error: Invalid hex data"; }
         }
 
-        // We need access to the protected/private methods of DspDevice or use the IDspiTransfer it holds
-        // DspDevice has private ControlTransferOut, but it takes (byte request, ushort value, byte[]? data)
-        // Since we are in the same namespace as DspDevice? No, we are in DSPiCliServer.Services
-        // But DspDevice.cs shows:
-        // private bool ControlTransferOut(byte request, ushort value = 0, byte[]? data = null)
-        // wait, I should check if it has a public one.
-        // Looking at IDspiTransfer.cs: 
-        // bool ControlTransferOut(byte request, ushort value = 0, byte[]? data = null);
-        
-        // Use reflection or change access if needed, but DspDevice holds a private _usb.
-        // Actually, let's see how DspDevice exposes it.
-        // It doesn't seem to expose it publicly. 
-        // I might need to make it public in DspDevice or add it to DspDevice's public API.
-        
-        // Wait, DspDevice in DSPiCliRemote might be an older version?
-        // Let's check the DspDevice.cs in the CURRENT project (DSPiConsole.Usb).
-        // It has it private.
-        
-        // However, I can use reflection for now if I don't want to change DspDevice.
-        var method = dv.MyDevice.GetType().GetMethod("ControlTransferOut", 
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        
-        if (method == null) return "Error: Method not found";
-        
-        var result = (bool?)method.Invoke(dv.MyDevice, new object?[] { request, value, data });
-        return result == true ? "OK" : "Error";
+        bool result = dv.MyDevice.ControlTransferOut(request, value, data);
+        return result ? "OK" : "Error";
     }
 
     private static string ControlTransferIn(DeviceManager dv, string[] parts)
@@ -181,13 +157,15 @@ public static class CommandParser
         if (!ushort.TryParse(parts[2], out ushort value)) return "Error: Invalid value";
         if (!int.TryParse(parts[3], out int length)) return "Error: Invalid length";
 
-        var method = dv.MyDevice.GetType().GetMethod("ControlTransferIn", 
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        
-        if (method == null) return "Error: Method not found";
-        
-        var result = (byte[]?)method.Invoke(dv.MyDevice, new object?[] { request, value, length });
-        return result != null ? Convert.ToHexString(result) : "Error";
+        try
+        {
+            var result = dv.MyDevice.ControlTransferIn(request, value, length);
+            return result != null ? Convert.ToHexString(result) : "Error";
+        }
+        catch (Exception ex)
+        {
+            return $"Error: {ex.Message}";
+        }
     }
 
     private static string GetPeaks(DeviceManager dv)
