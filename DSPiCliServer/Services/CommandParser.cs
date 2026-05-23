@@ -59,6 +59,52 @@ public static class CommandParser
         Console.WriteLine("[TestRun] CommandParser tests completed.");
     }
 
+    private static string GetHelp(string[] parts)
+    {
+        if (parts.Length == 1)
+        {
+            return "Available commands: ping, time, date, help, hello, get_all, get_vol, set_vol <db>, get_bypass, set_bypass <0/1>, get_loudness, set_loudness <0/1>, get_leveling, set_leveling <0/1>, get_crossfeed, set_crossfeed <0/1>, get_samplerate, get_deviceid, get_firmwareversion, get_activepreset, get_presets, set_preset, get_input, set_input <usb/spdif>, get_str, set_str <val>, run_str, kill_str, is_running. Type 'help <command>' for more info.";
+        }
+
+        var cmd = parts[1].ToLower();
+        return cmd switch
+        {
+            "ping" => "ping: Returns 'pong' to check connectivity.",
+            "time" => "time: Returns the current server time.",
+            "date" => "date: Returns the current server date.",
+            "help" => "help [command]: Shows available commands or detailed help for a specific command.",
+            "hello" => "hello: Returns a friendly greeting with the server version.",
+            "get_all" => "get_all: Returns status of all main parameters (volume, bypass, etc.).",
+            "get_vol" => "get_vol: Returns the current master volume in dB.",
+            "set_vol" => "set_vol <db>: Sets the master volume. Example: set_vol -10.5",
+            "get_bypass" => "get_bypass: Returns whether the DSP is currently bypassed.",
+            "set_bypass" => "set_bypass <0/1>: Enables (1) or disables (0) DSP bypass.",
+            "get_loudness" => "get_loudness: Returns whether loudness compensation is enabled.",
+            "set_loudness" => "set_loudness <0/1>: Enables (1) or disables (0) loudness compensation.",
+            "get_leveling" => "get_leveling: Returns whether volume leveling is enabled.",
+            "set_leveling" => "set_leveling <0/1>: Enables (1) or disables (0) volume leveling.",
+            "get_crossfeed" => "get_crossfeed: Returns whether crossfeed is enabled.",
+            "set_crossfeed" => "set_crossfeed <0/1>: Enables (1) or disables (0) crossfeed.",
+            "get_samplerate" => "get_samplerate: Returns the current audio sample rate.",
+            "get_deviceid" => "get_deviceid: Returns the unique serial number of the connected device.",
+            "get_firmwareversion" => "get_firmwareversion: Returns the firmware version of the connected device.",
+            "get_activepreset" => "get_activepreset: Returns the index of the currently active preset.",
+            "get_presets" => "get_presets: Returns a list of all available presets.",
+            "set_preset" => "set_preset <index>: Loads the preset at the specified index.",
+            "get_input" => "get_input: Returns the current input source (USB or SPDIF).",
+            "set_input" => "set_input <usb/spdif>: Sets the input source to USB or SPDIF.",
+            "get_str" => "get_str: Returns the currently stored script string.",
+            "set_str" => "set_str <val>: Stores a script string for later execution.",
+            "run_str" => "run_str: Executes the currently stored script string.",
+            "kill_str" => "kill_str: Terminates the currently running script.",
+            "is_running" => "is_running: Returns whether a script is currently running.",
+            "cto" => "cto <request> <value> [hexdata]: Performs a USB Control Transfer Out.",
+            "cti" => "cti <request> <value> <length>: Performs a USB Control Transfer In and returns data in hex.",
+            "get_peaks" => "get_peaks: Returns current peak level meter values.",
+            _ => $"Unknown command: {cmd}. Type 'help' for a list of commands."
+        };
+    }
+
     private static string ProcessCommand(string input)
     {
         // Simple echo/interpreter logic
@@ -76,7 +122,7 @@ public static class CommandParser
                 "ping" => "pong",
                 "time" => DateTime.Now.ToString("T"),
                 "date" => DateTime.Now.ToString("d"),
-                "help" => "Available commands: ping, time, date, help, hello, get_all, get_vol, set_vol <db>, get_bypass, set_bypass <0/1>, get_loudness, set_loudness <0/1>, get_leveling, set_leveling <0/1>, get_crossfeed, set_crossfeed <0/1>, get_samplerate, get_deviceid, get_firmwareversion, get_activepreset, get_presets, set_preset, get_input, set_input <usb/spdif>, get_str, set_str <val>, run_str, kill_str, is_running",
+                "help" => GetHelp(parts),
                 "get_vol" => dv.IsConnected ? (dv.MyDevice.GetMasterVolume()?.ToString("F1") ?? "Error") : "Not connected",
                 "set_vol" => (dv.IsConnected && parts.Length > 1 && float.TryParse(parts[1], out float vol)) ? (dv.MyDevice.SetMasterVolume(vol) ? "OK" : "Error") : "Error",
                 "get_bypass" => dv.IsConnected ? (dv.MyDevice.GetBypass()?.ToString() ?? "Error") : "Not connected",

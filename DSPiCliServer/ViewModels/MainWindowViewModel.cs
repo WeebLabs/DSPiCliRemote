@@ -11,10 +11,8 @@ public partial class MainWindowViewModel : ObservableObject
     private TcpServerService? _server;
     private HttpServerService? _httpServer;
 
-    public static string Version => "0.2";
+    public static string Version => "0.3";
     
-    //private DspDevice? _dspDevice => DeviceManager.Instance.MyDevice;
-
     public ObservableCollection<string> Logs { get; } = new();
     
     private void StartServer(int port, int httpPort)

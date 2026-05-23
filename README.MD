@@ -56,8 +56,10 @@ then it starts listening and just sits there
 ### To build it: (not required)
 * open the solution in Visual Studio or JetBrains Rider
 * copy the two DSPi project (DSPiConsole.Usb and DSPiConsole.Core) into the solution folder
-* change the target of the two projects to .NET 8 instead of the framework 8
-* one file (Channel.cs) takes a minor change to include Windows.System .Color instead of Windows.IO .Color
+  * change the target of the two projects to .NET 8 instead of the framework 8
+  * replace the Color definition in DSPiConsole.Core:Channel.cs to use Windows.System.Color instead of Windows.IO.Color
+  * Make DSPiConsole.Usb:ControlTransferIn/Out public methods
+
 
 ## non-Windows Operating System Installations
 All of these use the labeled zips and (except Mac) need to make the program executable.

@@ -9,6 +9,7 @@
         <FileVersion>0.2</FileVersion>
         <Configurations>Debug;Release;ReleaseX86;Releasex64;ReleaseArm64;Releaseoxxarm64</Configurations>
         <Platforms>AnyCPU</Platforms>
+        <BaseOutputPath>\tmp\bin</BaseOutputPath>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
