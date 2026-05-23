@@ -10,6 +10,9 @@ public static class CommandParser
     private static Process? _runningProcess;
     private static readonly object _processLock = new();
 
+    private static readonly List<string> _history = new();
+    private static readonly object _historyLock = new();
+
     public static string ProcessCommandPublic(string input) => ProcessCommand(input);
 
     public static void TestRun()
@@ -114,8 +117,29 @@ public static class CommandParser
         var command = parts[0].ToLower();
         var dv = DeviceManager.Instance;
 
+        // Add to history if it's a real command and not a duplicate of the last one
+        if (!string.IsNullOrWhiteSpace(input) && !input.StartsWith("help") && !input.StartsWith("get_history"))
+        {
+            lock (_historyLock)
+            {
+                if (_history.Count == 0 || _history[^1] != input.Trim())
+                {
+                    _history.Add(input.Trim());
+                    if (_history.Count > 20) _history.RemoveAt(0);
+                }
+            }
+        }
+
         try
         {
+            if (input == "\u001b[A") // Up arrow escape sequence
+            {
+                lock (_historyLock)
+                {
+                    return _history.Count > 0 ? _history[^1] : "";
+                }
+            }
+
             return command switch
             {
                 "hello" => DoHello(),
@@ -123,6 +147,7 @@ public static class CommandParser
                 "time" => DateTime.Now.ToString("T"),
                 "date" => DateTime.Now.ToString("d"),
                 "help" => GetHelp(parts),
+                "get_history" => string.Join("\n", _history),
                 "get_vol" => dv.IsConnected ? (dv.MyDevice.GetMasterVolume()?.ToString("F1") ?? "Error") : "Not connected",
                 "set_vol" => (dv.IsConnected && parts.Length > 1 && float.TryParse(parts[1], out float vol)) ? (dv.MyDevice.SetMasterVolume(vol) ? "OK" : "Error") : "Error",
                 "get_bypass" => dv.IsConnected ? (dv.MyDevice.GetBypass()?.ToString() ?? "Error") : "Not connected",
