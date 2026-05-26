@@ -1,4 +1,5 @@
 ## DSPi CommandLine Client and Server
+#### version 0.5
 MZachmann
 
 This is a tiny web page provider intended to work with the [WeebLabs DSPi project](https://github.com/WeebLabs/DSPi) that provides a quick 
@@ -15,6 +16,7 @@ Install/run it on the computer driving the DSPi Pico USB port. It takes very few
 using less than 1% of the CPU.
 
 ![web](./Images/Gui001.png)
+![web](./Images/Gui002.png)
 
 * The **USB** button lets you select between USB and SPDIF input sources.
 
@@ -108,3 +110,11 @@ echo "Please reboot"
 
 That should be the prerequisites.
 
+### Changelog
+
+05/26/26
+1. Add controls to set loudness amount and leveling compression when the 
+associated states are on.
+2. Have the state buttons change to green when on
+3. Add more help to the CLI display and add the new commands to the CLI and api
+4. Update the image

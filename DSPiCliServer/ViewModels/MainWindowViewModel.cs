@@ -11,7 +11,7 @@ public partial class MainWindowViewModel : ObservableObject
     private TcpServerService? _server;
     private HttpServerService? _httpServer;
 
-    public static string Version => "0.3";
+    public static string Version => "1.0";
     
     public ObservableCollection<string> Logs { get; } = new();
     

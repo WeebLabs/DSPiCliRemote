@@ -66,7 +66,7 @@ public static class CommandParser
     {
         if (parts.Length == 1)
         {
-            return "Available commands: ping, time, date, help, hello, get_all, get_vol, set_vol <db>, get_bypass, set_bypass <0/1>, get_loudness, set_loudness <0/1>, get_leveling, set_leveling <0/1>, get_crossfeed, set_crossfeed <0/1>, get_samplerate, get_deviceid, get_firmwareversion, get_activepreset, get_presets, set_preset, get_input, set_input <usb/spdif>, get_str, set_str <val>, run_str, kill_str, is_running. Type 'help <command>' for more info.";
+            return "Available commands: ping, time, date, help, hello, get_all, get_vol, set_vol <db>, get_bypass, set_bypass <0/1>, get_loudness, set_loudness <0/1>, get_leveling, set_leveling <0/1>, get_crossfeed, set_crossfeed <0/1>, get_intensity, set_intensity <value>, get_leveling_amount, set_leveling_amount <value>, get_samplerate, get_deviceid, get_firmwareversion, get_activepreset, get_presets, set_preset, get_input, set_input <usb/spdif>, get_str, set_str <val>, run_str, kill_str, is_running. Type 'help <command>' for more info.";
         }
 
         var cmd = parts[1].ToLower();
@@ -104,7 +104,11 @@ public static class CommandParser
             "cto" => "cto <request> <value> [hexdata]: Performs a USB Control Transfer Out.",
             "cti" => "cti <request> <value> <length>: Performs a USB Control Transfer In and returns data in hex.",
             "get_peaks" => "get_peaks: Returns current peak level meter values.",
-            _ => $"Unknown command: {cmd}. Type 'help' for a list of commands."
+            "get_intensity" => "get_intensity: Returns the current Loudness intensity (%).",
+            "set_intensity" => "set_intensity <value>: Sets the Loudness intensity (0 to 200).",
+            "get_leveling_amount" => "get_leveling_amount: Returns the current Leveling compression (%).",
+            "set_leveling_amount" => "set_leveling_amount <value>: Sets the Leveling compression (0 to 100).",
+            _ => $"Unknown command: {cmd}. Type 'help' for a list of commands or 'help <command>' for detailed help."
         };
     }
 
@@ -140,7 +144,7 @@ public static class CommandParser
                 }
             }
 
-            return command switch
+            string rslt = command switch
             {
                 "hello" => DoHello(),
                 "ping" => "pong",
@@ -170,6 +174,10 @@ public static class CommandParser
                 "cto" => ControlTransferOut(dv, parts),
                 "cti" => ControlTransferIn(dv, parts),
                 "get_peaks" => GetPeaks(dv),
+                "get_intensity" => dv.IsConnected ? (dv.MyDevice.GetLoudnessIntensity()?.ToString("F2") ?? "Error") : "Not connected",
+                "set_intensity" => (dv.IsConnected && parts.Length > 1 && float.TryParse(parts[1], out float intensity)) ? (dv.MyDevice.SetLoudnessIntensity(intensity) ? "OK" : "Error") : "Error",
+                "get_leveling_amount" => dv.IsConnected ? (dv.MyDevice.GetLevellerAmount()?.ToString("F2") ?? "Error") : "Not connected",
+                "set_leveling_amount" => (dv.IsConnected && parts.Length > 1 && float.TryParse(parts[1], out float amount)) ? (dv.MyDevice.SetLevellerAmount(amount) ? "OK" : "Error") : "Error",
                 "get_str" => _storedString ?? "None",
                 "set_str" => SetStr(input),
                 "run_str" => RunStr(),
@@ -177,6 +185,9 @@ public static class CommandParser
                 "is_running" => IsRunning(),
                 _ => $"Echo: {input}"
             };
+            rslt = rslt.Replace('<', '[');
+            rslt = rslt.Replace('>', ']');
+            return rslt;
         }
         catch (Exception ex)
         {
@@ -363,8 +374,12 @@ public static class CommandParser
         // Loudness
         sb.Append("loudness=").Append(parsed.LoudnessEnabled ? "1" : "0").Append(';');
 
+        // Intensity
+        sb.Append("intensity=").Append(parsed.LoudnessIntensityPct.ToString("F0")).Append(';');
+
         // Leveling
         sb.Append("leveling=").Append(parsed.LevellerEnabled ? "1" : "0").Append(';');
+        sb.Append("leveling_amount=").Append(parsed.LevellerAmount.ToString("F0")).Append(';');
 
         // Crossfeed
         sb.Append("crossfeed=").Append(parsed.CrossfeedEnabled ? "1" : "0").Append(';');

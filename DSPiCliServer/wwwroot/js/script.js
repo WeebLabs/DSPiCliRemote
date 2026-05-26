@@ -1,5 +1,11 @@
 const volSlider = document.getElementById('volSlider');
 const volLabel = document.getElementById('volLabel');
+const intensitySlider = document.getElementById('intensitySlider');
+const intensityLabel = document.getElementById('intensityLabel');
+const intensityGroup = document.getElementById('intensityGroup');
+const levelingAmountSlider = document.getElementById('levelingAmountSlider');
+const levelingAmountLabel = document.getElementById('levelingAmountLabel');
+const levelingAmountGroup = document.getElementById('levelingAmountGroup');
 const loudnessBtn = document.getElementById('loudnessBtn');
 const levelingBtn = document.getElementById('levelingBtn');
 const crossfeedBtn = document.getElementById('crossfeedBtn');
@@ -77,12 +83,36 @@ volSlider.onchange = async () => {
     await sendCommand(`set_vol ${volSlider.value}`);
 };
 
+intensitySlider.oninput = () => intensityLabel.textContent = intensitySlider.value;
+intensitySlider.onchange = async () => {
+    await sendCommand(`set_intensity ${intensitySlider.value}`);
+};
+
+levelingAmountSlider.oninput = () => levelingAmountLabel.textContent = levelingAmountSlider.value;
+levelingAmountSlider.onchange = async () => {
+    await sendCommand(`set_leveling_amount ${levelingAmountSlider.value}`);
+};
+
 let isLoudness = false;
+function updateLoudnessVisibility() {
+    if (intensityGroup) {
+        intensityGroup.style.display = isLoudness ? 'block' : 'none';
+    }
+}
+
+function updateLevelingVisibility() {
+    if (levelingAmountGroup) {
+        levelingAmountGroup.style.display = isLeveling ? 'block' : 'none';
+    }
+}
+
 loudnessBtn.onclick = async () => {
     isLoudness = !isLoudness;
     const res = await sendCommand(`set_loudness ${isLoudness ? 1 : 0}`);
     if (res === 'OK') {
         loudnessBtn.textContent = `Loudness: ${isLoudness ? 'ON' : 'OFF'}`;
+        loudnessBtn.style.background = isLoudness ? '#28a745' : '#007bff';
+        updateLoudnessVisibility();
     } else {
         isLoudness = !isLoudness;
     }
@@ -94,6 +124,8 @@ levelingBtn.onclick = async () => {
     const res = await sendCommand(`set_leveling ${isLeveling ? 1 : 0}`);
     if (res === 'OK') {
         levelingBtn.textContent = `Leveling: ${isLeveling ? 'ON' : 'OFF'}`;
+        levelingBtn.style.background = isLeveling ? '#28a745' : '#007bff';
+        updateLevelingVisibility();
     } else {
         isLeveling = !isLeveling;
     }
@@ -105,6 +137,7 @@ crossfeedBtn.onclick = async () => {
     const res = await sendCommand(`set_crossfeed ${isCrossfeed ? 1 : 0}`);
     if (res === 'OK') {
         crossfeedBtn.textContent = `Crossfeed: ${isCrossfeed ? 'ON' : 'OFF'}`;
+        crossfeedBtn.style.background = isCrossfeed ? '#28a745' : '#007bff';
     } else {
         isCrossfeed = !isCrossfeed;
     }
@@ -170,19 +203,32 @@ async function refresh() {
             volLabel.textContent = statusMap.vol;
         }
 
+        if (statusMap.intensity && !isNaN(parseFloat(statusMap.intensity))) {
+            intensitySlider.value = statusMap.intensity;
+            intensityLabel.textContent = Math.round(statusMap.intensity);
+        }
+
+        if (statusMap.leveling_amount && !isNaN(parseFloat(statusMap.leveling_amount))) {
+            levelingAmountSlider.value = statusMap.leveling_amount;
+            levelingAmountLabel.textContent = Math.round(statusMap.leveling_amount);
+        }
+
         if (statusMap.loudness) {
             isLoudness = statusMap.loudness === '1';
             loudnessBtn.textContent = `Loudness: ${isLoudness ? 'ON' : 'OFF'}`;
+            loudnessBtn.style.background = isLoudness ? '#28a745' : '#007bff';
         }
 
         if (statusMap.leveling) {
             isLeveling = statusMap.leveling === '1';
             levelingBtn.textContent = `Leveling: ${isLeveling ? 'ON' : 'OFF'}`;
+            levelingBtn.style.background = isLeveling ? '#28a745' : '#007bff';
         }
 
         if (statusMap.crossfeed) {
             isCrossfeed = statusMap.crossfeed === '1';
             crossfeedBtn.textContent = `Crossfeed: ${isCrossfeed ? 'ON' : 'OFF'}`;
+            crossfeedBtn.style.background = isCrossfeed ? '#28a745' : '#007bff';
         }
 
         if (statusMap.samplerate) {
@@ -200,6 +246,8 @@ async function refresh() {
 
     document.getElementById('idText').textContent = await sendCommand('get_deviceid');
     await updateOpticalUsbButton();
+    updateLoudnessVisibility();
+    updateLevelingVisibility();
 }
 
 refreshBtn.onclick = refresh;

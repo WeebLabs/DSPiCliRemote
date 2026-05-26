@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>DSPi Web Control v0.2</title>
+    <title>DSPi Web Control</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <style>
         body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; background: #f0f0f0; }
@@ -18,10 +18,18 @@
 </head>
 <body>
     <div class='card'>
-        <h2>DSPi Web Control</h2>
+        <h2>DSPi Web Control v1.0</h2>
         <div class='control-group'>
             <label>Master Volume: <span id='volLabel'>0.0</span> dB</label>
             <input type='range' id='volSlider' min='-100' max='12' step='0.5' value='0'>
+        </div>
+        <div class='control-group' id='intensityGroup'>
+            <label>Loudness Intensity: <span id='intensityLabel'>0</span>%</label>
+            <input type='range' id='intensitySlider' min='0' max='200' step='1' value='0'>
+        </div>
+        <div class='control-group' id='levelingAmountGroup'>
+            <label>Leveling Compression: <span id='levelingAmountLabel'>0</span>%</label>
+            <input type='range' id='levelingAmountSlider' min='0' max='100' step='1' value='0'>
         </div>
         <div class='btn-row'>
             <button id='loudnessBtn'>Loudness: OFF</button>
