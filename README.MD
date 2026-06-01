@@ -1,5 +1,5 @@
 ## DSPi CommandLine Client and Server
-#### version 0.5
+#### version 1
 MZachmann
 
 This is a tiny web page provider intended to work with the [WeebLabs DSPi project](https://github.com/WeebLabs/DSPi) that provides a quick 
@@ -9,11 +9,11 @@ gui via web browser as well as a REST interface.
 
 ### What is it?
 
-The **Server** is a small (about 5MB currently) console application that runs in Windows,
+The **Server** is a tiny (about 1MB currently) console application that runs in Windows,
 Mac, and Linux (Ubuntu and Raspbian are tested).
 
 Install/run it on the computer driving the DSPi Pico USB port. It takes very few resources. Top on a PI5 shows it
-using less than 1% of the CPU.
+using less than 1% of the CPU. In Windows it uses about 25MB of ram.
 
 ![web](./Images/Gui001.png)
 ![web](./Images/Gui002.png)

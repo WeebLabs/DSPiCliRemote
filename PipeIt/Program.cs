@@ -12,6 +12,16 @@ class Program
 
     static void Main(string[] args)
     {
+        while (true)
+        {
+            MainSub(args);
+            Console.WriteLine("PipeIt - Restarting");
+            Thread.Sleep(2000);
+        }
+    }
+
+    static void MainSub(string[] args)
+    {
         Console.WriteLine("PipeIt - Audio Loopback for macOS (and others)");
 
         try
@@ -38,12 +48,16 @@ class Program
 
             if (args.Length >= 2)
             {
-                if (int.TryParse(args[0], out int inIdx)) inputDevice = inIdx;
-                if (int.TryParse(args[1], out int outIdx)) outputDevice = outIdx;
+                if (int.TryParse(args[0], out int inIdx)) 
+                    inputDevice = inIdx;
+                if (int.TryParse(args[1], out int outIdx)) 
+                    outputDevice = outIdx;
             }
 
-            if (inputDevice == -1) inputDevice = PortAudio.DefaultInputDevice;
-            if (outputDevice == -1) outputDevice = PortAudio.DefaultOutputDevice;
+            if (inputDevice == -1) 
+                inputDevice = PortAudio.DefaultInputDevice;
+            if (outputDevice == -1) 
+                outputDevice = PortAudio.DefaultOutputDevice;
 
             if (inputDevice == PortAudio.NoDevice || outputDevice == PortAudio.NoDevice)
             {
