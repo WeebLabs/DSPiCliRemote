@@ -246,7 +246,7 @@ public class HttpServerService
         OnLog?.Invoke($"HTTP API Received: {body}");
 
         string result = InvokeTcpProcessCommand(body);
-        Console.WriteLine($"HTTP API Flow: {body}=>{result}");
+        Console.WriteLine($"HTTP Flow: {body}=>{result}");
         await SendResponseAsync(stream, 200, "OK", "text/plain", result);
     }
 
@@ -274,7 +274,7 @@ public class HttpServerService
         OnLog?.Invoke($"HTTP API GET Received: {commandLine}");
 
         string result = InvokeTcpProcessCommand(commandLine);
-        Console.WriteLine($"HTTP API GET Flow: {commandLine}=>{result}");
+        Console.WriteLine($"HTTP GET Flow: {commandLine}=>{result}");
         await SendResponseAsync(stream, 200, "OK", "text/plain", result);
     }
 

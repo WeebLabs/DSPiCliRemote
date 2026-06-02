@@ -9,20 +9,40 @@ class Program
     // Keeping a reference to the callback to prevent GC
     private static readonly PortAudioSharp.Stream.Callback _callback = MyCallback;
     private static int _channels = 2;
+    private static int[] _allowedRates = { 44100, 48000, 88200, 96000, 192000 };
 
     static void Main(string[] args)
     {
-        while (true)
+        var rslt = false;
+        while (!rslt)
         {
-            MainSub(args);
-            Console.WriteLine("PipeIt - Restarting");
-            Thread.Sleep(2000);
+            rslt = MainSub(args);   // return true if user asked to stop
+            if (!rslt)
+            {
+                Console.WriteLine("PipeIt - Restarting");
+                Thread.Sleep(2000);
+            }
         }
     }
 
-    static void MainSub(string[] args)
+    static SampleFormat BitsToBits(int bitsize)
     {
-        Console.WriteLine("PipeIt - Audio Loopback for macOS (and others)");
+        switch (bitsize)
+        {
+            case 32 :
+                return SampleFormat.Float32;
+            case 24 :
+                return SampleFormat.Int24;
+            case 16 :
+                return SampleFormat.Int16;
+            default :
+                throw new ArgumentException("Unsupported bit size");
+        }
+    }
+
+    static bool MainSub(string[] args)
+    {
+        Console.WriteLine("PipeIt - Audio Loopback for macOS. [-i in] [-o out] [-r rate] [-b sizebits]");
 
         try
         {
@@ -33,7 +53,7 @@ class Program
             if (deviceCount == 0)
             {
                 Console.WriteLine("No audio devices found.");
-                return;
+                return false;
             }
 
             Console.WriteLine($"Found {deviceCount} devices:");
@@ -45,13 +65,55 @@ class Program
 
             int inputDevice = -1;
             int outputDevice = -1;
+            int rateOfSpeed = 96000;        // default 96KHz
+            SampleFormat bitSize = SampleFormat.Int16;               // 16 bit int default?
 
             if (args.Length >= 2)
             {
-                if (int.TryParse(args[0], out int inIdx)) 
-                    inputDevice = inIdx;
-                if (int.TryParse(args[1], out int outIdx)) 
-                    outputDevice = outIdx;
+                for (int i = 0; i < (args.Length-1); i++)
+                {
+                    if (args[i].Length == 2 && '-' == args[i][0])
+                    {
+                        switch (args[i][1])
+                        {
+                            case 'i' : // input device
+                                if (int.TryParse(args[i+1], out int inIdx)) 
+                                    inputDevice = inIdx;
+                                i++;
+                                break;
+                            case 'o' : // output device
+                                if (int.TryParse(args[i+1], out int outIdx)) 
+                                    outputDevice = outIdx;
+                                i++;
+                                break;
+                            case 'r' : // rate of speed
+                                if (int.TryParse(args[i + 1], out int rate))
+                                {
+                                    // assume rates below 200 are in khz
+                                    if (rate < 200)
+                                        rate *= 1000;
+                                    if(_allowedRates.Contains(rate))
+                                        rateOfSpeed = rate;
+                                    else
+                                    {
+                                        Console.WriteLine($"Invalid bit rate of {rate}");
+                                        string ratelist = string.Join(',', _allowedRates.Select(x => x.ToString()));
+                                        Console.WriteLine($"Pick from {ratelist}");
+                                    }
+                                }
+                                i++;
+                                break;
+                            case 'b' : // size in bits
+                                if (int.TryParse(args[i+1], out int bits))
+                                    bitSize = BitsToBits(bits);
+                                i++;
+                                break;
+                            default:
+                                Console.WriteLine($"Unknown argument: {args[i]}");
+                                return false;
+                        }
+                    }
+                }
             }
 
             if (inputDevice == -1) 
@@ -62,7 +124,7 @@ class Program
             if (inputDevice == PortAudio.NoDevice || outputDevice == PortAudio.NoDevice)
             {
                 Console.WriteLine("Error: Could not find default input or output device.");
-                return;
+                return false;
             }
 
             var inputDeviceInfo = PortAudio.GetDeviceInfo(inputDevice);
@@ -72,7 +134,7 @@ class Program
             Console.WriteLine($"Using Output: [{outputDevice}] {outputDeviceInfo.name}");
 
             // Common audio parameters
-            double sampleRate = 96000;
+            double sampleRate = rateOfSpeed;
             uint framesPerBuffer = 256; 
             _channels = Math.Min(inputDeviceInfo.maxInputChannels, outputDeviceInfo.maxOutputChannels);
             _channels = Math.Max(1, Math.Min(_channels, 2)); // Use Mono or Stereo
@@ -80,30 +142,32 @@ class Program
             StreamParameters inputParameters = new StreamParameters();
             inputParameters.device = inputDevice;
             inputParameters.channelCount = _channels;
-            inputParameters.sampleFormat = SampleFormat.Float32;
+            inputParameters.sampleFormat = bitSize;
             inputParameters.suggestedLatency = inputDeviceInfo.defaultLowInputLatency;
             inputParameters.hostApiSpecificStreamInfo = IntPtr.Zero;
 
             StreamParameters outputParameters = new StreamParameters();
             outputParameters.device = outputDevice;
             outputParameters.channelCount = _channels;
-            outputParameters.sampleFormat = SampleFormat.Float32;
+            outputParameters.sampleFormat = bitSize;
             outputParameters.suggestedLatency = outputDeviceInfo.defaultLowOutputLatency;
             outputParameters.hostApiSpecificStreamInfo = IntPtr.Zero;
-
+            
             using (var stream = new PortAudioSharp.Stream(inputParameters, outputParameters, sampleRate, framesPerBuffer, StreamFlags.NoFlag, _callback, IntPtr.Zero))
             {
                 stream.Start();
-                Console.WriteLine($"Piping audio ({_channels} channels). Press Enter to stop...");
+                Console.WriteLine($"Piping audio: ({_channels} channels) at {rateOfSpeed}.{bitSize}. Press Enter to stop...");
                 Console.ReadLine();
                 stream.Stop();
             }
 
             Console.WriteLine("Stopped.");
+            return true;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
+            return false;
         }
         finally
         {
