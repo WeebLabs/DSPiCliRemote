@@ -57,23 +57,23 @@ then it starts listening and just sits there
 
 ### To build it: (not required)
 * open the solution in Visual Studio or JetBrains Rider
-* copy the two DSPi project (DSPiConsole.Usb and DSPiConsole.Core) into the solution folder
+* copy the two DSPi projects (DSPiConsole.Usb and DSPiConsole.Core) from the github DSPi-Console-Windows repository into the solution folder
   * change the target of the two projects to .NET 8 instead of the framework 8
   * replace the Color definition in DSPiConsole.Core:Channel.cs to use Windows.System.Color instead of Windows.IO.Color
   * Make DSPiConsole.Usb:ControlTransferIn/Out public methods
 
 
 ## non-Windows Operating System Installations
-All of these use the labeled zips and (except Mac) need to make the program executable.
+All of these use the labeled zips and need to make the program executable.
 
 ### Mac OS X
 Start by installing .NET 8 from the web.
 
 1. Get the DSPiCliRemote ZIP file from the repository Releases
-2. Run chmod +x on the application file (DSPiCliRemote) and if you want to use it, also on the PipeIt application file in the subfolder.
-3. Run the application file (DSPiCliRemote)
+2. Run chmod +x on the application file (DSPiCliServer) and if you want to use it, also on the PipeIt application file in the subfolder.
+3. Run the application file (DSPiCliServer)
 
-After you try to run the app, unblock it in the Privacy tab of the Security & Privacy settings and allow it to run/communicate.
+After you try to run the app the first time, unblock it in the Privacy tab of the Security & Privacy settings and allow it to run/communicate.
 
 ### Ubuntu & Raspbian
 1. I installed .NET 8 by going to the Microsoft site and following the instructions.
@@ -83,12 +83,18 @@ After you try to run the app, unblock it in the Privacy tab of the Security & Pr
     https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.420-linux-arm64-binaries
 
     And displays this script to install that version of it.
+    
+    Note that if you want to run DSPiCliServer as root (during startup) then the .bashrc path export lines should
+    also be in the root startup script but replacing $HOME with /home/myusername.
+
 ```bash
     mkdir -p $HOME/dotnet && tar zxf dotnet-sdk-8.0.420-linux-arm64.tar.gz -C $HOME/dotnet
     echo "export DOTNET_ROOT=\$HOME/dotnet" >>~/.bashrc
     echo "export PATH=\$PATH:\$HOME/dotnet:\$HOME/dotnet/tools" >>~/.bashrc
     source ~/.bashrc
 ```
+
+
 2. They both require installation of libusb-1.0 via
 ```bash
 sudo apt install libusb-1.0-0-dev 
@@ -111,7 +117,8 @@ echo "Please reboot"
 That should be the prerequisites.
 
 ### Changelog
-
+6/2/26
+1. Update to the latest console code to ensure compatability
 05/26/26
 1. Add controls to set loudness amount and leveling compression when the 
 associated states are on.
