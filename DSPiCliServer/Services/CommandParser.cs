@@ -10,6 +10,9 @@ public static class CommandParser
     private static Process? _runningProcess;
     private static readonly object _processLock = new();
 
+    public static bool ShowUserVolume { get; set; } = false;
+    public static bool ShowMasterVolume { get; set; } = true;
+
     private static readonly List<string> _history = new();
     private static readonly object _historyLock = new();
 
@@ -66,7 +69,7 @@ public static class CommandParser
     {
         if (parts.Length == 1)
         {
-            return "Available commands: ping, time, date, help, hello, get_all, get_vol, set_vol <db>, get_vol_user, set_vol_user <db>, get_bypass, set_bypass <0/1>, get_loudness, set_loudness <0/1>, get_leveling, set_leveling <0/1>, get_crossfeed, set_crossfeed <0/1>, get_intensity, set_intensity <value>, get_leveling_amount, set_leveling_amount <value>, get_samplerate, get_deviceid, get_firmwareversion, get_activepreset, get_presets, set_preset, get_input, set_input <usb/spdif>, get_str, set_str <val>, run_str, kill_str, is_running. Type 'help <command>' for more info.";
+            return "Available commands: ping, time, date, help, hello, get_all, get_vol, set_vol <db>, get_vol_user, set_vol_user <db>, set_show_user_vol, set_show_master_vol, get_bypass, set_bypass <0/1>, get_loudness, set_loudness <0/1>, get_leveling, set_leveling <0/1>, get_crossfeed, set_crossfeed <0/1>, get_intensity, set_intensity <value>, get_leveling_amount, set_leveling_amount <value>, get_samplerate, get_deviceid, get_firmwareversion, get_activepreset, get_presets, set_preset, get_input, set_input <usb/spdif>, get_str, set_str <val>, run_str, kill_str, is_running. Type 'help <command>' for more info.";
         }
 
         var cmd = parts[1].ToLower();
@@ -76,6 +79,8 @@ public static class CommandParser
             "time" => "time: Returns the current server time.",
             "date" => "date: Returns the current server date.",
             "help" => "help [command]: Shows available commands or detailed help for a specific command.",
+            "set_show_user_vol" => "set_show_user_vol <0/1>: Shows (1) or hides (0) the User Volume slider.",
+            "set_show_master_vol" => "set_show_master_vol <0/1>: Shows (1) or hides (0) the Master Volume slider.",
             "hello" => "hello: Returns a friendly greeting with the server version.",
             "get_all" => "get_all: Returns status of all main parameters (volume, bypass, etc.).",
             "get_vol" => "get_vol: Returns the current master volume in dB.",
@@ -187,6 +192,8 @@ public static class CommandParser
                 "run_str" => RunStr(),
                 "kill_str" => KillStr(),
                 "is_running" => IsRunning(),
+                "set_show_user_vol" => (parts.Length > 1) ? (ShowUserVolume = parts[1] == "1").ToString() : "Error",
+                "set_show_master_vol" => (parts.Length > 1) ? (ShowMasterVolume = parts[1] == "1").ToString() : "Error",
                 _ => $"Echo: {input}"
             };
             rslt = rslt.Replace('<', '[');
@@ -398,6 +405,10 @@ public static class CommandParser
         // Active Preset
         int active = dv.MyDevice.GetActivePreset();
         sb.Append("preset=").Append(active).Append(';');
+
+        // UI States
+        sb.Append("show_user_vol=").Append(ShowUserVolume ? "1" : "0").Append(';');
+        sb.Append("show_master_vol=").Append(ShowMasterVolume ? "1" : "0").Append(';');
 
         // Sample Rate (still needs a status call, but it's okay)
         uint? rate = dv.MyDevice.GetStatusUInt32(15);

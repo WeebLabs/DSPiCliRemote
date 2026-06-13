@@ -176,13 +176,15 @@ crossfeedBtn.onclick = async () => {
     }
 };
 
-uvolBtn.onclick = () => {
+uvolBtn.onclick = async () => {
     isUvolVisible = !isUvolVisible;
+    await sendCommand(`set_show_user_vol ${isUvolVisible ? 1 : 0}`);
     updateUvolVisibility();
 };
 
-mvolBtn.onclick = () => {
+mvolBtn.onclick = async () => {
     isMvolVisible = !isMvolVisible;
+    await sendCommand(`set_show_master_vol ${isMvolVisible ? 1 : 0}`);
     updateMvolVisibility();
 };
 
@@ -290,14 +292,21 @@ async function refresh() {
                 inputBtn.style.background = inputSource.toLowerCase() === 'spdif' ? '#0056b3' : '#007bff';
             }
         }
+
+        if (statusMap.show_user_vol) {
+            isUvolVisible = statusMap.show_user_vol === '1';
+        }
+        if (statusMap.show_master_vol) {
+            isMvolVisible = statusMap.show_master_vol === '1';
+        }
+        updateUvolVisibility();
+        updateMvolVisibility();
     }
 
     document.getElementById('idText').textContent = await sendCommand('get_deviceid');
     await updateOpticalUsbButton();
     updateLoudnessVisibility();
     updateLevelingVisibility();
-    updateUvolVisibility();
-    updateMvolVisibility();
 }
 
 refreshBtn.onclick = refresh;
