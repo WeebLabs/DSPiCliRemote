@@ -119,6 +119,7 @@ That should be the prerequisites.
 ### Changelog
 6/2/26
 1. Update to the latest console code to ensure compatability
+
 05/26/26
 1. Add controls to set loudness amount and leveling compression when the 
 associated states are on.

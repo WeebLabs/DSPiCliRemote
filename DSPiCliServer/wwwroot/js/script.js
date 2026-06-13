@@ -1,5 +1,7 @@
 const volSlider = document.getElementById('volSlider');
 const volLabel = document.getElementById('volLabel');
+const uvolSlider = document.getElementById('uvolSlider');
+const uvolLabel = document.getElementById('uvolLabel');
 const intensitySlider = document.getElementById('intensitySlider');
 const intensityLabel = document.getElementById('intensityLabel');
 const intensityGroup = document.getElementById('intensityGroup');
@@ -9,6 +11,10 @@ const levelingAmountGroup = document.getElementById('levelingAmountGroup');
 const loudnessBtn = document.getElementById('loudnessBtn');
 const levelingBtn = document.getElementById('levelingBtn');
 const crossfeedBtn = document.getElementById('crossfeedBtn');
+const uvolBtn = document.getElementById('uvolBtn');
+const uvolGroup = document.getElementById('uvolGroup');
+const mvolBtn = document.getElementById('mvolBtn');
+const mvolGroup = document.getElementById('mvolGroup');
 const presetSelect = document.getElementById('presetSelect');
 const refreshBtn = document.getElementById('refreshBtn');
 const logDiv = document.getElementById('log');
@@ -83,6 +89,11 @@ volSlider.onchange = async () => {
     await sendCommand(`set_vol ${volSlider.value}`);
 };
 
+uvolSlider.oninput = () => uvolLabel.textContent = uvolSlider.value;
+uvolSlider.onchange = async () => {
+    await sendCommand(`set_vol_user ${uvolSlider.value}`);
+};
+
 intensitySlider.oninput = () => intensityLabel.textContent = intensitySlider.value;
 intensitySlider.onchange = async () => {
     await sendCommand(`set_intensity ${intensitySlider.value}`);
@@ -103,6 +114,28 @@ function updateLoudnessVisibility() {
 function updateLevelingVisibility() {
     if (levelingAmountGroup) {
         levelingAmountGroup.style.display = isLeveling ? 'block' : 'none';
+    }
+}
+
+let isUvolVisible = true;
+function updateUvolVisibility() {
+    if (uvolGroup) {
+        uvolGroup.style.display = isUvolVisible ? 'block' : 'none';
+    }
+    if (uvolBtn) {
+        uvolBtn.textContent = `User: ${isUvolVisible ? 'Show' : 'Hide'}`;
+        uvolBtn.style.background = isUvolVisible ? '#007b80' : '#007bff';
+    }
+}
+
+let isMvolVisible = true;
+function updateMvolVisibility() {
+    if (mvolGroup) {
+        mvolGroup.style.display = isMvolVisible ? 'block' : 'none';
+    }
+    if (mvolBtn) {
+        mvolBtn.textContent = `Master: ${isMvolVisible ? 'Show' : 'Hide'}`;
+        mvolBtn.style.background = isMvolVisible ? '#007b80' : '#007bff';
     }
 }
 
@@ -141,6 +174,16 @@ crossfeedBtn.onclick = async () => {
     } else {
         isCrossfeed = !isCrossfeed;
     }
+};
+
+uvolBtn.onclick = () => {
+    isUvolVisible = !isUvolVisible;
+    updateUvolVisibility();
+};
+
+mvolBtn.onclick = () => {
+    isMvolVisible = !isMvolVisible;
+    updateMvolVisibility();
 };
 
 presetSelect.onchange = async () => {
@@ -203,6 +246,11 @@ async function refresh() {
             volLabel.textContent = statusMap.vol;
         }
 
+        if (statusMap.user_vol && !isNaN(parseFloat(statusMap.user_vol))) {
+            uvolSlider.value = statusMap.user_vol;
+            uvolLabel.textContent = statusMap.user_vol;
+        }
+
         if (statusMap.intensity && !isNaN(parseFloat(statusMap.intensity))) {
             intensitySlider.value = statusMap.intensity;
             intensityLabel.textContent = Math.round(statusMap.intensity);
@@ -248,6 +296,8 @@ async function refresh() {
     await updateOpticalUsbButton();
     updateLoudnessVisibility();
     updateLevelingVisibility();
+    updateUvolVisibility();
+    updateMvolVisibility();
 }
 
 refreshBtn.onclick = refresh;

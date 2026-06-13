@@ -19,9 +19,13 @@
 <body>
     <div class='card'>
         <h2>DSPi Web Control v1.0</h2>
-        <div class='control-group'>
+        <div class='control-group' id='mvolGroup'>
             <label>Master Volume: <span id='volLabel'>0.0</span> dB</label>
             <input type='range' id='volSlider' min='-100' max='12' step='0.5' value='0'>
+        </div>
+        <div class='control-group' id='uvolGroup'>
+            <label>User Volume: <span id='uvolLabel'>0.0</span> dB</label>
+            <input type='range' id='uvolSlider' min='-100' max='12' step='0.5' value='0'>
         </div>
         <div class='control-group' id='intensityGroup'>
             <label>Loudness Intensity: <span id='intensityLabel'>0</span>%</label>
@@ -36,9 +40,14 @@
             <button id='levelingBtn'>Leveling: OFF</button>
             <button id='crossfeedBtn'>Crossfeed: OFF</button>
         </div>
-        <div class='control-group'>
-            <label for='presetSelect'>Preset:</label>
-            <select id='presetSelect' style='width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;'>
+        <div class='btn-row' style='align-items: center;'>
+            <label for='uvolBtn' style='margin-bottom: 0;'>Volume:</label>
+            <button id='uvolBtn'>User: ON</button>
+            <button id='mvolBtn'>Master: ON</button>
+        </div>
+        <div class='control-group' style='display: flex; align-items: center; gap: 10px;'>
+            <label for='presetSelect' style='margin-bottom: 0; line-height: 1;'>Preset:</label>
+            <select id='presetSelect' style='flex-grow: 1; padding: 8px; border-radius: 4px; border: 1px solid #ccc;'>
                 <option value='-1'>Loading...</option>
             </select>
         </div>

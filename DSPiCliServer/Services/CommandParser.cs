@@ -66,7 +66,7 @@ public static class CommandParser
     {
         if (parts.Length == 1)
         {
-            return "Available commands: ping, time, date, help, hello, get_all, get_vol, set_vol <db>, get_bypass, set_bypass <0/1>, get_loudness, set_loudness <0/1>, get_leveling, set_leveling <0/1>, get_crossfeed, set_crossfeed <0/1>, get_intensity, set_intensity <value>, get_leveling_amount, set_leveling_amount <value>, get_samplerate, get_deviceid, get_firmwareversion, get_activepreset, get_presets, set_preset, get_input, set_input <usb/spdif>, get_str, set_str <val>, run_str, kill_str, is_running. Type 'help <command>' for more info.";
+            return "Available commands: ping, time, date, help, hello, get_all, get_vol, set_vol <db>, get_vol_user, set_vol_user <db>, get_bypass, set_bypass <0/1>, get_loudness, set_loudness <0/1>, get_leveling, set_leveling <0/1>, get_crossfeed, set_crossfeed <0/1>, get_intensity, set_intensity <value>, get_leveling_amount, set_leveling_amount <value>, get_samplerate, get_deviceid, get_firmwareversion, get_activepreset, get_presets, set_preset, get_input, set_input <usb/spdif>, get_str, set_str <val>, run_str, kill_str, is_running. Type 'help <command>' for more info.";
         }
 
         var cmd = parts[1].ToLower();
@@ -80,6 +80,8 @@ public static class CommandParser
             "get_all" => "get_all: Returns status of all main parameters (volume, bypass, etc.).",
             "get_vol" => "get_vol: Returns the current master volume in dB.",
             "set_vol" => "set_vol <db>: Sets the master volume. Example: set_vol -10.5",
+            "get_vol_user" => "get_vol_user: Returns the current user volume in dB.",
+            "set_vol_user" => "set_vol_user <db>: Sets the user volume. Example: set_vol_user -5.0",
             "get_bypass" => "get_bypass: Returns whether the DSP is currently bypassed.",
             "set_bypass" => "set_bypass <0/1>: Enables (1) or disables (0) DSP bypass.",
             "get_loudness" => "get_loudness: Returns whether loudness compensation is enabled.",
@@ -154,6 +156,8 @@ public static class CommandParser
                 "get_history" => string.Join("\n", _history),
                 "get_vol" => dv.IsConnected ? (dv.MyDevice.GetMasterVolume()?.ToString("F1") ?? "Error") : "Not connected",
                 "set_vol" => (dv.IsConnected && parts.Length > 1 && float.TryParse(parts[1], out float vol)) ? (dv.MyDevice.SetMasterVolume(vol) ? "OK" : "Error") : "Error",
+                "get_vol_user" => dv.IsConnected ? (dv.MyDevice.GetUserVolume()?.ToString("F1") ?? "Error") : "Not connected",
+                "set_vol_user" => (dv.IsConnected && parts.Length > 1 && float.TryParse(parts[1], out float uvol)) ? (dv.MyDevice.SetUserVolume(uvol) ? "OK" : "Error") : "Error",
                 "get_bypass" => dv.IsConnected ? (dv.MyDevice.GetBypass()?.ToString() ?? "Error") : "Not connected",
                 "set_bypass" => (dv.IsConnected && parts.Length > 1) ? (dv.MyDevice.SetBypass(parts[1] == "1") ? "OK" : "Error") : "Error",
                 "get_loudness" => dv.IsConnected ? (dv.MyDevice.GetLoudnessEnabled()?.ToString() ?? "Error") : "Not connected",
@@ -363,6 +367,10 @@ public static class CommandParser
         // Master Volume (prefer BulkParams value if available, but DspDevice has it too)
         float? vol = parsed.HasMasterVolume ? parsed.MasterVolumeDb : dv.MyDevice.GetMasterVolume();
         sb.Append("vol=").Append(vol?.ToString("F1") ?? "Error").Append(';');
+
+        // User Volume
+        float? uvol = parsed.HasUserVolume ? parsed.UserVolumeDb : dv.MyDevice.GetUserVolume();
+        sb.Append("user_vol=").Append(uvol?.ToString("F1") ?? "Error").Append(';');
 
         // Input Source
         string input = parsed.HasInputConfig ? (parsed.InputSource == 0 ? "Usb" : "Spdif") : (dv.MyDevice.GetInputSource()?.ToString() ?? "Error");
