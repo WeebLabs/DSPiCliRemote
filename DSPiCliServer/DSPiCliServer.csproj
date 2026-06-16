@@ -5,8 +5,8 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <AssemblyVersion>1.0</AssemblyVersion>
-        <FileVersion>1.0</FileVersion>
+        <AssemblyVersion>1.02</AssemblyVersion>
+        <FileVersion>1.02</FileVersion>
         <Configurations>Debug;Release;ReleaseX86;Releasex64;ReleaseArm64;Releaseoxxarm64</Configurations>
         <Platforms>AnyCPU</Platforms>
         <BaseOutputPath>\tmp\bin</BaseOutputPath>
