@@ -12,8 +12,8 @@ gui via web browser as well as a REST interface.
 The **Server** is a tiny (about 1MB currently) console application that runs in Windows,
 Mac, and Linux (Ubuntu and Raspbian are tested).
 
-Install/run it on the computer driving the DSPi Pico USB port. It takes very few resources. Top on a PI5 shows it
-using less than 1% of the CPU. In Windows it uses about 25MB of ram.
+Install/run it on the computer driving the DSPi Pico USB port. The current version takes very few resources. Top on a **Pi Zero 2** shows it
+using about 1% of the CPU. It uses about 25MB of ram.
 
 ![web](./Images/Gui001.png)
 ![web](./Images/Gui002.png)
@@ -116,7 +116,58 @@ echo "Please reboot"
 
 That should be the prerequisites.
 
+### Raspbian Autostart
+If you want to autostart a Pi with the cliserver. Assuming you installed .NET in your home folder as described above...
+
+1. create a bash script in your home folder to point to the .NET path. I place the app folder on my desktop. It's probably
+better in your home folder. Anyway, 
+```bash
+nano dspicli.sh
+chmod +x dspicli.sh
+```
+
+``````
+#!/bin/bash
+export DOTNET_ROOT=/home/myusername/dotnet
+export PATH=$PATH:/home/myusername/dotnet:/home/myusername/dotnet/tools
+cd /home/myusername/Desktop/DSPiCliRemote-LinuxArm64
+./DSPiCliServer
+``````
+
+2. put a new service file into /usr/lib/systemd/system :
+```bash
+sudo nano /usr/lib/systemd/system/DSPiCliRemote.service
+```
+
+``````
+Description=DSPiCliServer
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/home/myusername/dspicli.sh
+
+[Install]
+WantedBy=multi-user.target
+``````
+Then enable and start the service using
+```bash
+sudo systemctl enable DSPiCliRemote.service
+sudo systemctl start DSPiCliRemote.service
+```
+
+
 ### Changelog
+
+6/16/26
+1. Update to the latest console code to ensure compatability
+2. Remove bottleneck with .usb to boost performance
+
+6/9/26
+1. Add auto-shown sliders for loudness and level setting.
+2. Add an optional slider for User volume.
+3. Enable hiding Master volume slider.
+
 6/2/26
 1. Update to the latest console code to ensure compatability
 
