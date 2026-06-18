@@ -2,21 +2,23 @@
 #### version 1
 MZachmann
 
-This is a tiny web page provider intended to work with the [WeebLabs DSPi project](https://github.com/WeebLabs/DSPi) that provides a quick 
-gui via web browser as well as a REST interface.
+The DSPiCliRemote project contains a server application: DSPiCliServer that is a tiny web page and command line interface (CLI) server intended to work with the [WeebLabs DSPi project](https://github.com/WeebLabs/DSPi).
 
-#### Note: this now requires .NET 8.
+DSPiCliServer contains a quick gui via web browser, a CLI, and a REST interface. The CLI works with the DSPi Console application to run the console remotely
+on a Windows machine while DSPiCliServer is running on whatever is connected to the DSPi Pico USB port.
+
+#### Note: this requires .NET 8.
 
 ### What is it?
 
-The **Server** is a tiny (about 1MB currently) console application that runs in Windows,
+The **Server** is a tiny (less than 1MB currently) console application that runs in Windows,
 Mac, and Linux (Ubuntu and Raspbian are tested).
 
 Install/run it on the computer driving the DSPi Pico USB port. The current version takes very few resources. Top on a **Pi Zero 2** shows it
 using about 1% of the CPU. It uses about 25MB of ram.
 
-![web](./Images/Gui001.png)
-![web](./Images/Gui002.png)
+<img src="https://github.com/MZachmann/DSPiCliRemote/raw/main/Images/Gui001.png" alt="DSPiCliServer gui1" width="400" >
+<img src="https://github.com/MZachmann/DSPiCliRemote/raw/main/Images/Gui002.png" alt="DSPiCliServer gui2" width="350" >
 
 * The **USB** button lets you select between USB and SPDIF input sources.
 
